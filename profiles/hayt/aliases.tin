@@ -1,0 +1,2 @@
+#nop {}
+#alias {identifyall} {shop;w;n;e;e;n;e;identify all;w;s;w;w;s;e;home;guild;n;e;e;sell all}

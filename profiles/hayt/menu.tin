@@ -1,0 +1,25 @@
+#NOP
+
+#echo {Alts:};
+#echo {};
+
+#echo {1) Hayt(elemental)};
+#var {my[alts][1][name]}{hayt3s};
+#var {my[alts][1][guild]}{elemental};
+
+#echo {2) Crunch(necromancer) (reaper)};
+#var {my[alts][2][name]}{crunch3s};
+#var {my[alts][2][guild]}{necromancer};
+#var {my[alts][2][subguild]}{reaper};
+
+
+#echo {};
+#echo {con <number>:};
+
+#line oneshot #alias {^%d$}{con %1};
+
+#line oneshot #alias {con}{
+	connect ${my[alts][%1][name]};
+	#unvar {my[alts]};
+	#unalias {con}
+};

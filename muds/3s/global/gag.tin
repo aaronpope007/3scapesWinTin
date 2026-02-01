@@ -117,25 +117,25 @@
 #gag {shortsword %1 like %2 %3 the %4}
 #gag {%1 the shortsword like %2 %3 the %4}
 #gag {^The sword bites like %1 into %2}
-#gag {^You hit %1.};
-#gag {The bracers flare brightly and your form wavers slightly!}
-#gag {The Sword strikes with an unholy power!}
-#gag {The scorpion stabs you with its stinger!}
-#gag {The elemental CRUSHES you with an %1 fist!}
-#gag {The elemental CRUSHES you with a %1 fist!}
-#gag {The Staff of the Magi unleashes a torrent of magical energy upon %1}
-#gag {The staff strikes with %1 force!}
-#gag {You can feel the liquid churn inside of you...}
-#gag {Magical energies course through your body.}
-#gag {Shansabyk tears through you like a man possessed!}
-#gag {Cow kicks you with its hoof!}
-#gag {Cow tramples you!}
-#gag {Cow moos, 'MOOOooOOOoOOO!'}
-#gag {Cow moos, 'MOOO mooo MOOOOOO!'}
-#gag {You KICK the Biker boot right up}
-#gag {Your shield blocks %1 attack!}
-#gag {A cow says:}
-#gag {The donut poisons %1 with a massive dose of sugar and fat!}
+##gag {^You hit %1.};
+#gag {^The bracers flare brightly and your form wavers slightly!}
+#gag {^The Sword strikes with an unholy power!}
+#gag {^The scorpion stabs you with its stinger!}
+#gag {^The elemental CRUSHES you with an %1 fist!}
+#gag {^The elemental CRUSHES you with a %1 fist!}
+#gag {^The Staff of the Magi unleashes a torrent of magical energy upon %1}
+#gag {^The staff strikes with %1 force!}
+#gag {^You can feel the liquid churn inside of you...}
+#gag {^Magical energies course through your body.}
+#gag {^Shansabyk tears through you like a man possessed!}
+#gag {^Cow kicks you with its hoof!}
+#gag {^Cow tramples you!}
+#gag {^Cow moos, 'MOOOooOOOoOOO!'}
+#gag {^Cow moos, 'MOOO mooo MOOOOOO!'}
+#gag {^You KICK the Biker boot right up}
+#gag {^Your shield blocks %1 attack!}
+#gag {^A cow says:}
+#gag {^The donut poisons %1 with a massive dose of sugar and fat!}
 #gag {The donut flings piping hot glaze at %1}
 #gag {The donut invades %1 mind with cravings for chocolate!}
 #gag {A wave of sparks fly from the bracers, striking your opponent!}
@@ -234,3 +234,347 @@
 
 #NOP JEDI GAG
 #gag {COMBAT TIME VERY LONG.. YOU NEED TO FINISH THIS SUCKER UP!}
+
+
+#NOP PARTY
+#gag {Your energy pours out with}
+#gag {Your great speed allows you to attack again}
+#gag {Your ambition overflows}
+#gag {You feel a burning sensation in your veins}
+#gag {Your hand touches the whip}
+#gag {You call the forces of time to ravage}
+#gag {insight strikes you}
+#gag {tightly, you draw from}
+#gag {of the basic elements that you use}
+#gag {Time to make it hurt.}
+#gag {Insidious inspiration strikes you}
+#gag {You find yourself satisfied with your}
+#gag {leaps in to assist}
+#gag {You manipulate mental and magical}
+#gag {Merrilin exposes}
+#gag {Merrilin's acolyte}
+#gag {Avatar of Elentil}
+#gag {Merrilin wraps}
+#gag {Merrilin unwraps}
+#gag {Merrilin chants}
+#gag {Merrilin casts}
+#gag {Merrilin summons}
+#gag {subversion!}
+#gag {incredible force!}
+#gag {Merrilin grants a blessing}
+#gag {Serenity descends over the area}
+#gag {Seconds later a fiery aura}
+#gag {Merrilin begins to close the plane rift}
+#gag {Merrilin sits on the ground, opens a book,}
+#gag {Merrilin prays to Galan}
+#gag {grants the power of life to himself}
+#gag {glows with a healing light}
+#gag {A blaze of shadowy fire rises from the depths of the earth!}
+#gag {The dark fire flickers and dies away, the}
+#gag {fiery rage empowers}
+#gag {You tune your breathing and heart rate}
+#gag {body slowly heal and vanish}
+#gag {Castiel is still for a moment}
+#gag {The time stone glows and expands, engulfing}
+#gag {and you feel hot rage}
+#gag {Firey rage empowers your strikes}
+#gag {The shadowy fire ignites strange passions in you}
+#gag {You tune your breathing and heart}
+#gag {shudders as the pain of age}
+#gag {Sevlana Sedai grimaces, }
+#gag {Sevlana Sedai furrow}
+#gag {Sevlana furrows}
+#gag {Sevlana Sedai frown}
+#gag {Sevlana glances at}
+#gag {twitches spazmodically}
+#gag {Dave's wounds close}
+#gag {stands IMMOBILIZED}
+#gag {shift and swirl}
+#gag {as muscles act independently of the mind!}
+#gag {fist into Dave's gut!}
+#gag {The giant tries his best to feign an attack.}
+#gag {internal stores.}
+#gag {Saving crafting status.}
+#gag {Dave removes his blade from the corpse of his enemy}
+#gag {Dave salutes his fallen foe}
+#gag {a center of calm in a sea of turb}
+#gag {seems to vanish momentarily as}
+#gag {in horror, blood boiling in}
+#gag {has shaken off the effects of the aging!}
+#gag {Spontanius kicks}
+#gag {Spontanius punches}
+#gag {Spontanius leaps}
+#gag {Jinkies ferociously bites}
+#gag {Jinkies tears into}
+#gag {With perfect precision,}
+#gag {Radiant being thrusts himself into the air,}
+#gag {mutilated body repairs itself}
+#gag {bleeding stops and his gaping}
+#gag {Radiant Being attacks iwth enraged fury!}
+#gag {looks revitalized by an unseen}
+#gag {Radiant Being glows with a soft light.}
+#gag {Radiant Being banks}
+#gag {wings beat powerfully}
+#gag {soars gracefully out of the way}
+#gag {In a thunder of wings,}
+#gag {Radiant being glows with a soothing energy.}
+#gag {With a flex of his wings}
+#gag {body looks like it was infused}
+#gag {Radiant Being thrusts himself into the air,}
+#gag {devastating wounds heal at an amazing}
+#gag {Einherjer gasps for breath}
+#gag {flickers in and out of sight for a moment}
+#gag {writhes about in great agony.}
+#gag {Someone in the distances cries out in agony.}
+#gag {The metallic sounds of weapons clashing}
+#gag {'s wounds close rapidly.}
+#gag {attacks with an animalistic ferocity and speed!}
+
+
+
+
+
+
+
+#NOP Angarboda
+#gag {The giant guard}
+#gag {Giant Guard twitch}
+#gag {The clash of combat distracts}
+#gag {The giant tries his best to fein an attack}
+#gag {the sheer power as he surges forward overwhelms}
+#gag {Your attack is empowered by furious rage!}
+#gag {A stream of fire shoots out towards}
+#gag {You feel intense pain}
+#gag {goes into a state of frenzy}
+#gag {The ashes in the air makes it hard to}
+
+#NOP Sewers
+#gag {The fungus shoots a stream of acid at you!}
+#gag {Poison from the sludge eats into your skin.}
+#gag {Your skin burns as the sludge sprays you}
+#gag {Acid from the fungus burns at your skin}
+#gag {With surprising speed the beast}
+#gag {The muck monster bashes you in the head.}
+
+#NOP Corpse Dump
+#gag {The skeleton punches at}
+#gag {undergoes nucleosynthesis and}
+#gag {A charred chunk of carbonized}
+#gag {sidesteps with the practiced ease}
+#gag {twisting into a sneer of disdain}
+#gag {The spider bites at}
+#gag {The wraith passes through}
+#gag {The banshee wails at}
+#gag {The ghoul bites at}
+
+
+#NOP CHAOS SEA
+#gag {The mutant screams, bellowing radioactive}
+
+
+#NOP Angarboda
+#gag {The blob oozes around}
+#gag {The blob surges forward}
+#gag {The blob crushes}
+#gag {of bones and parts}
+#gag {strikes with renewed strength}
+#gag {Inspired by the banner}
+#gag {retaliates with a}
+
+
+
+#NOP Druid
+#gag {An eclipse formed by the wings}
+#gag {A raven swoops down}
+#gag {The skay darkens ominously}
+#gag {blots out all but}
+#gag {cacophony that seems to}
+#gag {the victim's core}
+#gag {sound that vibrates}
+#gag {downward, each bird a star}
+#gag {An infinity of ravens}
+#gag {The sky darkens ominously}
+#gag {physical weight.}
+#gag {endless, suffocating}
+#gag {The air turns into a vortex}
+#gag {casting them into a twilight}
+#gag {foreboding sense of doom}
+#gag {their numbers so vast}
+#gag {A raven's wings buffet}
+#gag {A raven's talons scrape}
+#gag {glow of the ravens' eyes}
+#gag {chest with an unexpected}
+#gag {them in a pocket of space}
+#gag {firece onslaught, pecking}
+#gag {feet, dodging away}
+#gag {their attention away from}
+#gag {judgment from which}
+#gag {The heavy darkness thins and}
+#gag {shapes slowly return}
+#gag {where time and space lose meaning}
+#gag {A mythic assembly of raven}
+#gag {overwhelmed as a raven}
+#gag {making it nearly impossible}
+#gag {focus on any offensive}
+#gag {presence warping the very}
+#gag {and halt their}
+#gag {staggers as a raven dives}
+#gag {attention away from the battle}
+#gag {arm, leaving behind a}
+#gag {Agony splinters from you}
+#gag {Your suffering dissipates}
+#gag {Your torment dulls}
+#gag {A vortex of wind}
+#gag {The void between worlds}
+#gag {Shadows swirl around}
+#gag {An icy rush of power}
+#gag {as their weapon lands}
+#gag {The mutant sprays radioactive}
+#gag {flickering darkness in its wake}
+#gag {with a fierce onslaught}
+#gag {a portion of your injury}
+#gag {A deep, resonant sound}
+#gag {Eerie light flickers}
+#gag {patterns that dance unpredict}
+#gag {is frozen in place by the frosted armor!}
+#gag {The sharp edge of injury blunts as it}
+#gag {concentration of dark energy amass}
+#gag {Arcane symbols flare to life along}
+#gag {behind a stinging reminder}
+#gag {The bond absorbs your suffering}
+#gag {burns and unstable mutations}
+#gag {A portion of your injury}
+#gag {outline blurs momentarily}
+#gag {ground beneath the hand trembles}
+#gag {channels deeper, forbidden powers.}
+#gag {Pain flows like a river}
+#gag {any offensive action.}
+#gag {anticipation, as if ready to unleash}
+#gag {The hand's shadow stertches ominously}
+#gag {with an unexpected force}
+#gag {appears wreathed in shadow}
+#gag {Faint, spectral shapes twist}
+#gag {The ground seems to recoil}
+#gag {inevitable and overwhelming}
+#gag {A ghostly howl accompanies}
+#gag {The scent of cold earth and blood}
+#gag {For a heartbeat, }
+#gag {the void between worlds.}
+#gag {The power bites deep and}
+#gag {and emptiness flicker}
+#gag {The echo of your distress}
+#gag {The battlefield shudders as}
+#gag {The hand's shadow stretches ominous}
+#gag {The zombie bites}
+#gag {dodging away with}
+#gag {shadow-fueled attack.}
+#gag {unnatural fury.}
+#gag {strikes home.}
+#gag {The weight of your wound is shared}
+#gag {a stinging remind of its presence.}
+#gag {Dark tendrils lash out from}
+#gag {A pulse of sinister energy}
+#gag {The very air distorts}
+#gag {The echo of battle fills your senses.}
+#gag {weapon gleams with a}
+#gag {steel should.}
+#gag {action is accompanied by a}
+#gag {through the battlefield}
+#gag {Your attack is wreathed in}
+#gag {Shadows coil along your blade}
+#gag {A surge of eldritch might erupt}
+#gag {A cold, eldritch vigor}
+#gag {channelled assult connects,}
+#gag {The ground trembles beneath the force}
+#gag {is frozen in place by the frosted}
+#gag {magic that brightens}
+#gag {A pulse of dark energy bursts}
+#gag {A cold clarity seizes you}
+#gag {Your weapon hums with}
+#gag {Your muscles tremble as}
+#gag {The thin, brittle ring hanging}
+#gag {still echoing behind}
+#gag {drops his guard, taunting and mocking}
+#gag {The rabbit bites}
+#gag {Your pain fractures and disappears}
+#gag {You feel the warlike vigor}
+#gag {glassy for a heartbeat}
+#gag {balance is momentarily upset}
+#gag {Shadows ripple along your}
+#gag {The air shudders with unnatural}
+#gag {flinches a moment too late}
+#gag {moves with uncanny strength}
+#gag {heartbeat, leaving them looking}
+#gag {shadow lags behind them for}
+#gag {driving every spell and strike}
+#gag {with grim resolve.}
+#gag {A cold, exultant rage}
+#gag {The air shudders with}
+#gag {of spectral claws.}
+#gag {unnaturally swift.}
+#gag {themselves fight at your side.}
+#gag {unnaturally swift.}
+#gag {Thunder rumbles in the distance}
+#gag {relentless assault.}
+#gag {For a moment, you sense}
+#gag {The pain fractures and}
+#gag {that grows louder with intent}
+#gag {has left a ringing behind}
+#gag {pupils flickering as if listening}
+#gag {You leap to assist}
+#gag {The connection of Valdgrimur fuels}
+#gag {The strike lands with a wet}
+#gag {standing there with a vacant}
+#gag {inside them slipped on suddenly}
+#gag {from the force, but}
+#gag {a stinging reminder of its presence.}
+#gag {Your pain fractures and}
+#gag {spectral power coils through your}
+#gag {The air hangs heavy with the strink}
+#gag {channelled assault connects}
+#gag {a shiver runs through the air}
+#gag {briefly at their temples instead of}
+#gag {to them, it's still ending}
+#gag {shoulders jerk at an angle}
+#gag {trying to shrug off}
+#gag {wrap around your arm, guiding}
+#gag {savage precision.}
+#gag {not to the blow but to}
+#gag {their eyes.}
+#gag {eyes where hollow}
+#gag {to a sound no one else can}
+#gag {and a more natural focus creeps}
+#gag {Your senses sharpen as the}
+#gag {where hollow echo had been}
+#gag {The malign force retreats}
+#gag {slick with sweat}
+#gag {mends, and}
+#gag {You see a ripple pass}
+#gag {their aura swirling with red}
+#gag {fingers digging in as if}
+#gag {the pain out of}
+#gag {The threads tighten and the corpse}
+#gag {The echo of a thousand battles}
+#gag {The mists that veiled}
+#gag {steaming and raw}
+#gag {every action.}
+#gag {blow.}
+#gag {Valdgrimur.}
+#gag {battlefield.}
+#gag {A surge of shadowed}
+#gag {Talto attacks}
+#gag {strength.}
+#gag {lands.}
+#gag {power.}
+#gag {terrifying potential.}
+#gag {unnatural force.}
+#gag {unstoppable.}
+#gag {face goes blank for a heartbeat}
+#gag {how to wear it.}
+#gag {bears only a shallow mark}
+#gag {power tears into}
+#gag {This monster has already been affected by age}
+#gag {struck but did no damage to}
+#gag {Bobert }
+#gag {Wibble }
+#gag {Quickben }
