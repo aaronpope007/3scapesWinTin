@@ -19,7 +19,7 @@
 }{2};
 
 #NOP ***** Extract Raw Data *********
-#ACTION {{^\#K\%$mip[id](.{3})(.{3})(.*)}$} {
+#ACTION {{%*\#K\%$mip[id](.{3})(.{3})(.*)}$} {
 	#VAR {mip[source]} {%0};
 	#VAR {mip[%3][data]} {%4};
 	.mipProcessFlag {%3} {%4};
@@ -42,20 +42,107 @@
 	#if	{$idle_min < 10}{#var idle_min 0$idle_min};
 	#if	{$idle_sec < 10}{#var idle_sec 0$idle_sec};
 	#format {idle_cap}	{%+4s}	{<268>[<128>$idle_hr<268>:<128>$idle_min<268>:<128>$idle_sec<268>]<088>};
+
+		#if {"$mapping" == "on"} {
+		#format {mapstatus} {<068>[MAPPING]<088>};
+	} {
+		#var mapstatus {};
+	};
+
+	#switch {$stepignore} {
+		#case {0} {
+			#if {$bot} {
+				#if {$autokill} {
+					#format {stepper} {<068>[S:B(A)]};
+				} {
+					#format {stepper} {<068>[S:B(P)]};
+				};
+			} {
+				#format {stepper} {<068>[S]<088>};
+			};		
+		};
+		#case {1} {
+			#if {$bot} {
+				#if {$autokill} {
+					#format {stepper} {<068>[M:B(A)]};
+				} {
+					#format {stepper} {<068>[M:B(P)]};
+				};
+			} {
+				#var stepper {<068>[M]};
+			};
+		};
+		#case {2} {
+			#var stepper {<068>[W]};
+		};
+		#case {3} {
+			#var stepper {<068>[C]};
+		};
+	};
+
 	#if	{&botcycle[] > 0} {
 		#format {areacap} {<148>Cycle: <168>$cycle<148>\-<168>$botcycle[$cycle]<088>}
 	} {
 		#var areacap {};	
 	};
+	#if {$bot == 1} {
+		#if {$autokill} {
+			#format {botstatus} {<068>[BOT:ON]<088>};
+		} {
+			#format {botstatus} {<128>[BOT:PAUSED]<088>};
+		}
+	} {
+		#var botstatus {};
+	};
+	#if {$keepalive_active == 1} {
+		#format {keepalivestatus} {<068>[KEEP:$keepalive_count/3]<088>};
+	} {
+		#var keepalivestatus {};
+	};
+	#if {$idle > $IdleLimit} {
+		#if {$bot_was_active == 1} {
+			#format {idlewarning} {<128>[IDLED OUT]<088>};
+		} {
+			#format {idlewarning} {<128>[IDLE WARNING]<088>};
+		}
+	} {
+		#var idlewarning {};
+	};
+	#if {"$bot_stop_reason" != ""} {
+		#format {stopreason} {<128>[$bot_stop_reason]<088>};
+	} {
+		#var stopreason {};
+	};
 	#if {"$draw[caption]" == "on"} {
-		#SHOWME {<088> <128>$world_cap <068>Uptime: <168>$uptime_cap  <038>Reboot: <138>$reboot_cap  <fca>Lag: <fcb>$lag_cap  <228>Idle: $idle_cap<088>  $areacap<088>} {19}
+		#SHOWME {<088> <128>$world_cap <068>Uptime: <168>$uptime_cap  <038>Reboot: <138>$reboot_cap  <fca>Lag: <fcb>$lag_cap  <228>Idle: $idle_cap<088>  $areacap<088> $stepper $mapstatus $botstatus $keepalivestatus $idlewarning $stopreason} {19}
+		#if {$idle > $IdleLimit} {
+			#if {$bot_was_active == 1} {
+				#SHOWME {<128>****************************************<088>} {20}
+				#SHOWME {<128>*  BOT DEACTIVATED DUE TO IDLE TIME  *<088>} {21}
+				#SHOWME {<128>*  Will auto-restart on next input  *<088>} {22}
+			} {
+				#SHOWME {<128>****************************************<088>} {20}
+				#SHOWME {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>} {21}
+				#SHOWME {<128>****************************************<088>} {22}
+			}
+		} {
+			#SHOWME {<088>} {20}
+			#SHOWME {<088>} {21}
+			#SHOWME {<088>} {22}
+		}
 	};
 }
 
 #var clockon 0
 #var IdleLimit 900
+#var idle_warned 0
+#var bot_was_active 0
+#var last_input_ticks -1000
+#var tick_counter 0
+#var bot_stop_reason {}
 #TICKER {idle} {
 	#math {idle} {$idle + 1};
+	#math {tick_counter} {$tick_counter + 1};
 	#if {$idle > 900} {
 		#draw tile 21 1 -8 1 {<BF00>}
 	}; #elseif {$idle > 840} {
@@ -65,16 +152,153 @@
 	}; #elseif {$idle < 600} {
 		#screen clear square 21 1 -8 1
 	};
-	#if {$bot && $idle > $IdleLimit} {
-		.stop;
-		#unvar bot;
-		#delay {gohome} {go home} {100}
+	#if {$idle > $IdleLimit && $idle_warned == 0} {
+		#bell;
+		#var idle_warned 1;
+		#echo {};
+		#echo {<128>****************************************<088>};
+		#echo {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>};
+		#echo {<128>*  You have been idle for 15+ minutes  *<088>};
+		#echo {<128>****************************************<088>};
+		#echo {};
+	};
+	#if {$bot == 1 && $idle > $IdleLimit && $idle_warned == 1} {
+		#math {ticks_since_input} {$tick_counter - $last_input_ticks};
+		#if {$ticks_since_input > 60 || $last_input_ticks < 0} {
+			#bell;
+			#echo {};
+			#echo {<128>****************************************<088>};
+			#echo {<128>*  BOT DEACTIVATED DUE TO IDLE TIME  *<088>};
+			#echo {<128>*  Idle limit exceeded: 15 minutes   *<088>};
+			#echo {<128>*  Idle: $idle seconds               *<088>};
+			#echo {<128>*  Ticks since input: $ticks_since_input *<088>};
+			#echo {<128>*  Bot stopped                       *<088>};
+			#echo {<128>*  Will auto-restart on next input  *<088>};
+			#echo {<128>****************************************<088>};
+			#echo {};
+			#var bot_was_active 1;
+			#var bot_stop_reason {DEADMAN: Idle $idle};
+			#echo {<128>[Deadman] Trigger fired - Idle: $idle, Limit: $IdleLimit, Ticks since input: $ticks_since_input, Last input ticks: $last_input_ticks, Current tick: $tick_counter<088>};
+			.stop;
+			#unvar bot;
+		} {
+			#echo {<068>[Deadman] Prevented - Input too recent (Ticks: $ticks_since_input, Last: $last_input_ticks, Current: $tick_counter)<088>};
+		}
+	};
+	#if {$bot == 1 && "$bot_stop_reason" != ""} {
+		#var bot_stop_reason {};
 	};
 	update_caption
 } {1}
 
 #EVENT {RECEIVED INPUT} {
+	#var old_idle $idle;
 	#var idle 0;
+	#var idle_warned 0;
+	#var last_input_ticks $tick_counter;
+	#if {$bot == 1} {
+		#echo {<068>[Idle] Reset from $old_idle to 0 (Bot active, Ticks: $tick_counter)<088>};
+	};
+	#if {$keepalive_count > 0 && $keepalive_count < 3} {
+		#var keepalive_count 0;
+		#echo {<068>[Keepalive] Timer reset by user input<088>};
+		update_caption;
+	};
+	#if {$keepalive_was_active == 1 && $keepalive_active == 0} {
+		#var keepalive_active 1;
+		#var keepalive_count 0;
+		#ticker {party_keepalive} {
+			#if {$keepalive_active == 1} {
+				#if {$keepalive_count < 3} {
+					#math keepalive_count {$keepalive_count + 1};
+					#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+					#send {};
+					update_caption;
+					#if {$keepalive_count >= 3} {
+						#unticker party_keepalive;
+						#var keepalive_active 0;
+						#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
+						update_caption;
+					}
+				}
+			}
+		} {299};
+		#echo {<068>[Keepalive] Auto-restarted after user input<088>};
+		update_caption;
+	};
+	#if {$bot != 1} {
+		#var bot 1;
+		#var autokill 1;
+		#var bot_was_active 1;
+		#var idle_warned 0;
+		#var bot_stop_reason {};
+		#echo {<068>[Bot] Auto-restarted after user input<088>};
+		update_caption;
+		#NOP Always resume movement when bot restarts
+		#delay {0.5} {ki}
+	}
+}
+
+#TICKER {keepalive} {
+	#if {$bot == 1 && $idle < $IdleLimit} {
+		#echo {<068>[Keepalive] Sending keepalive signal (Idle: $idle / $IdleLimit)<088>};
+		#send {}
+	}
+} {299}
+
+#NOP Standalone keepalive for party mode (works without bot)
+#var keepalive_active 0
+#var keepalive_count 0
+#var keepalive_was_active 0
+
+#TICKER {party_keepalive} {
+	#if {$keepalive_active == 1} {
+		#if {$keepalive_count < 3} {
+			#math keepalive_count {$keepalive_count + 1};
+			#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+			#send {};
+			update_caption;
+			#if {$keepalive_count >= 3} {
+				#unticker party_keepalive;
+				#var keepalive_active 0;
+				#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
+				update_caption;
+			}
+		}
+	}
+} {299}
+
+#alias {.keepalive} {
+	#if {$keepalive_active == 1} {
+		#unticker party_keepalive;
+		#var keepalive_active 0;
+		#var keepalive_count 0;
+		#var keepalive_was_active 0;
+		#echo {<128>Party keepalive stopped<088>};
+		update_caption;
+	} {
+		#var keepalive_active 1;
+		#var keepalive_count 0;
+		#var keepalive_was_active 1;
+		#ticker {party_keepalive} {
+			#if {$keepalive_active == 1} {
+				#if {$keepalive_count < 3} {
+					#math keepalive_count {$keepalive_count + 1};
+					#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+					#send {};
+					update_caption;
+					#if {$keepalive_count >= 3} {
+						#unticker party_keepalive;
+						#var keepalive_active 0;
+						#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
+						update_caption;
+					}
+				}
+			}
+		} {299};
+		#echo {<068>Party keepalive started (will send 3 times, auto-restarts on input)<088>};
+		update_caption;
+	}
 }
 
 #NOP ***** Individual Data Sections *****
@@ -434,6 +658,10 @@
 	#REGEX {%0} { stumbles in confusion as the headband hypnotizes } {#var mipgag 1};
 	#REGEX {%0} { stumbles in confusion as the amulet hypnotizes } {#var mipgag 1};
 
+	#REGEX {%0} {~Korenth~} {#bell};
+	#REGEX {%0} {~Zanadu~} {#bell};
+	#REGEX {%0} {~Simon~} {#bell};
+	#REGEX {%0} {~Setinekht~} {#bell};
 	#IF {$mipgag == 0} {.mipProcessBAB %0}
 }
 
@@ -442,9 +670,11 @@
 #var chat[max] 100
 
 #ALIAS {show_chat} {
-	#math chat[start]	{$chat[rows] * $chat[page]};
-	#math chat[end]		{$chat[rows] * $chat[page] - $chat[rows] + 1};
-	#line sub {var} #draw {tile} 1 1 $chat[rows] -44 $chat[log][-$chat[start]..-$chat[end]]
+	#if {"$draw[chat]" == "on"}{
+		#math chat[start]	{$chat[rows] * $chat[page]};
+		#math chat[end]		{$chat[rows] * $chat[page] - $chat[rows] + 1};
+		#line sub {var} #draw {tile} 1 1 $chat[rows] -$map[width]-2 $chat[log][-$chat[start]..-$chat[end]]
+	};
 }
 
 #ALIAS {update_chat} {

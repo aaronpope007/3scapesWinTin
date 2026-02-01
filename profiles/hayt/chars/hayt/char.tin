@@ -1,0 +1,149 @@
+#class {hayt} {open}
+
+#var guild elemental
+#nop nop is dont read this line
+#map unlink n;
+#map unlink w;
+si;
+#var csea 1;
+#remember, go seacask goes to the cask... duh
+
+
+#alias {kidonates} {#var kicount 0;#ticker {kirundonates} {ki;#math {kicount} {$kicount + 1};#if {$kicount >= 90} {#unticker kirundonates}} {10}}
+
+
+#alias {blasts} {cb;ab;cb;ab;cb;ab;cb;ab;cb;ab;pav;give all to mass;give all to giant;give all to mutant;give all to einherjer;give all to human}
+
+#act {There is no beast here} {kill thorn beast};
+#act {Phenomenon pokes you} {passist always phenomenon;partyrole wuss;follow phenomenon}
+
+#act {You attack} {evoke age;gouge};
+#act {You are now seeking to achieve equipollence.} {p equipollent is ON};
+#act {You are no longer seeking to achieve equipollence.} {p equipollent is OFF};
+#act {Bag of Major Sending: Ok.} {put bag in vortex};
+#act {Gswap was successful.} {evoke autodrain};
+#act {turn off equi} {evoke equipollent};
+#act {Hayt joins the party.} {partyrole wuss;passist always rictor;follow rictor};
+#act {You arrive at the Sea of Chaos.} {#delay {3600} {wake hayt;tell hayt -=> You can reset sea!}}
+#act {Digbicknick dealt the} {#delay {1} {ki}}
+#act {Digbicknick rushes into combat} {merc hp}
+
+#act {You have become size} {p wow look at me! glvl!};
+#act {%1 raspberries you!} {
+  #echo {Rally trigger!!!};
+  #bell;
+  #format recruit {%l} {%1};
+  rally $recruit;
+};
+
+#alias {defenseup} {defense slashing;defense crushing;defense ice;defense fire;defense acid;defense shocking;defense mental;defense magical;defense toxic;defense radiation};
+
+#alias {tgiants} {fantasy;portal ice;s;s;e;e;e;e;e;n;e;e;s;e;e;read runes;n;n;nw;nw;n;n;climb over logs;n;n;squeeze between poles;n;n;n;n;n;n;n;n;e;e;e;n;n;climb down;dmg magical};
+#alias {fgiants} {climb up;s;s;w;w;w;s;s;s;s;s;s;s;s;s;s;se;s;s;se;se;s;s;leave;w;w;n;w;w;s;w;w;w;w;w;n;n;portal;home;dmg fire};
+#alias {tsea} {chaos;enter;e;e;e;s;s;e;e;n;e;e;e;s;s;lick ooze;dmg acid;enter sea;los};
+#alias {fsea} {out;n;n;w;w;w;s;w;w;n;n;w;w;w;vortex;home;shop;w;n;n;deposit all;s;s;e;home;leave;hc;dmg fire};
+#alias {endsea} {open cask;get all;enter portal;unsetsea;setsea 59;fsea;drop all;tsea;out;unsetsea}
+#alias {tsewer} {chaos;enter;e;e;s;leap over ditch;e;exa hole;n;n;e;e;e;e;n;n;n;enter;dmg mental};
+#alias {tunderdark} {fantasy;pe;e;e;e;e;e;s;s;s;s;s;s;s;s;w;w;w;w;w;s;s;s;s;s;s;w;w;s}
+#alias {fdump} {u;w;w;sw;s;s;s;u;u;u;out;e;e;n;n;n;n;n;n;e;e;e;e;e;n;n;n;n;n;n;n;n;w;w;w;w;w;portal;home;leave;hc}
+#dalias {tdump} {n;n;n;ne;e;e;d}
+#alias {tserinth} {fantasy;portal;w;w;w;w;w;w;w;s;s;s;s;s;s;s;e;charter serinth}
+#alias {tdragonisle} {se;se;se;e;s;s;s;s;s;w;s;s;s;s;e;s;s;s;w;w;w;w;w;w;w;s;s;s;s;s;s;s;s;s;s;s;s;w;w;w;s;se;e;s;sw;w;s;s;s;w;w;s;s;enter town;s;s;s;w;w;enter traveler;push 2}
+#alias {tbyrontic} {n;n;leave;w;n;n;n;n;n;n;n;n;w;w;n;w;ne;n;nw;w;w;sw;se;e;n;e}
+#alias {getfang} {n;n;leave;w;w;w;w;w;w;w;s;s;e}
+#alias {fromfang} {w;n;n;e;e;e;e;e;e;e;enter village;s;s;enter traveler}
+#alias {fromfang2} {e;e;e;e;e;e;n;n;e;e;n;n;n;e;ne;n;w;nw;n;e;e;e;n;n;n;n;n;n;n;n;n;n;n;n;e;e;e;e;e;e;e;n;n;n;w;n;n;n;n;e;n;n;n;n;n;w;nw;nw;nw;board ferry}
+#alias {fromferry} {w;n;n;n;n;n;n;n;n;e;e;e;e;e;e;e;portal;home;leave;hc}
+
+#act {The time stone is becoming unstable} {drop stone}
+#act {The traveler arrives at its destination.} {exit}
+#act {~^You have found %+1w!$} {wake hayt;tell hayt world drop?}
+
+
+#NOP AREA TRIGGERS FOR LEADING/KILLING
+#act {Castiel dealt} {#delay {1} {ki}}
+#act {Pit fiend dealt} {#delay {1} {ki}}
+#act {Hayt dealt the killing blow} {#echo {<068>[Kill Trigger] Fired - calling ki to continue bot<088>};#delay {1} {ki}}
+
+
+
+/* HP Bars */
+#gag { HP:%2/%3 C:%4\%  NRG:%5/%6(%7)  SP:%8/%9  B:%10(%11) G2N:%12} 
+#act { HP:%2/%3 C:%4\%  NRG:%5/%6(%7)  SP:%8/%9  B:%10(%11) G2N:%12} {
+	#var my[hp][current]		{%2};
+	#var my[hp][max]		{%3};
+	#var my[cohesion]		{%4};
+	#var my[gp1][current]		{%5};
+	#var my[gp1][max]		{%6};
+	#var my[emit][level]		{%7};
+	#var my[sp][current]		{%8};
+	#var my[sp][max]		{%9};
+	#var my[blasts]			{%10};
+	#var my[reset]			{%11};
+	#var my[g2n][full-string]	{%12};
+	#regex {$my[g2n][full-string]}{T:%*:%*\%}{
+		#var {enemy[name]}{&1};
+		#var {enemy[hp]}{&2};
+		#var my[incombat] 1;
+		#math {my[damagetracker][rounds]}{$my[damagetracker][rounds] + 1};
+	}{
+		#var {enemy[name]}{None};
+		#var {enemy[hp]}{0};
+		#var my[incombat] 0;
+	};
+	update_status;
+}
+
+#var {mytt_damage_last} 0;
+#var {mytt_damage_total} 0;
+#var {mytt_damage_rounds} 0;
+#var {mytt_damage_avg} 0;
+#var {mytt_damage_high} 0;
+#var {mytt_damage_low} 0;
+
+#act {You hit %* %d time%* for %d damage.} {
+  #var {mytt_damage_last} {%4};
+  #math {mytt_damage_total} {$mytt_damage_total + %4};
+  #math {mytt_damage_rounds} {$mytt_damage_rounds + 1};
+  #if {$mytt_damage_rounds > 0} {
+    #math {mytt_damage_avg} {$mytt_damage_total / $mytt_damage_rounds};
+  };
+  #if {$mytt_damage_high == 0 || %4 > $mytt_damage_high} {
+    #var {mytt_damage_high} {%4};
+  };
+  #if {$mytt_damage_low == 0 || %4 < $mytt_damage_low} {
+    #var {mytt_damage_low} {%4};
+  };
+  #echo {DMG: <128>$mytt_damage_last<088> | AVG DMG: <132>$mytt_damage_avg<088> ($mytt_damage_rounds) | TOTAL DMG: <134>$mytt_damage_total<088> | HIGH: <121>$mytt_damage_high<088> | LOW: <124>$mytt_damage_low<088>};
+}
+#gag {You hit %* %d time%* for %d damage.}
+
+#alias {update_status} {
+	#var {my[hp][graph]}\t\t{@graph{$my[hp][current];$my[hp][max]}};
+	#var {my[sp][graph]}\t\t{@graph{$my[sp][current];$my[sp][max]}};
+	#var {my[gp1][graph]}\t\t{@graph{$my[gp1][current];$my[gp1][max]}};
+	#var {enemy[graph]}\t\t{@graph{$enemy[hp];100}};
+	#format {hp}\t\t{%+4s} {@colscale{$my[hp][current];$my[hp][max]}};
+	#format {hp_max}\t\t{%+4s} {<128>$my[hp][max]<088>};
+	#format {sp}\t\t{%+4s} {@colscale{$my[sp][current];$my[sp][max]}};
+	#format {sp_max}\t\t{%+4s} {<128>$my[sp][max]<088>};
+	#format {nrg}\t\t{%+4s} {@colscale{$my[gp1][current];$my[gp1][max]}};
+	#format {nrg_max}\t\t{%+4s} {<128>$my[gp1][max]<088>};
+	#format {ehealth}\t\t{%+3s} {@colscale{$enemy[hp];100}};
+	#showme {H:${hp}/${hp_max}  S:${sp}/${sp_max}  N:${nrg}/${nrg_max}  E:$enemy[name](${ehealth}%)} {-4};
+	#showme {H:${my[hp][graph]} S:${my[sp][graph]} N:${my[gp1][graph]} E:${enemy[graph]}} {-3};
+	#showme {$mip[gline][2]} {-6};
+	#showme {$mip[gline][1]} {-7};
+}
+
+#alias {resetdmg} {
+  #var {mytt_damage_last} 0;
+  #var {mytt_damage_total} 0;
+  #var {mytt_damage_rounds} 0;
+  #var {mytt_damage_avg} 0;
+  #var {mytt_damage_high} 0;
+  #var {mytt_damage_low} 0;
+  #echo {Damage stats reset.};
+}
+
+#class {hayt} {close}
