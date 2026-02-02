@@ -17,8 +17,17 @@ si;
 #alias {endsea} {open cask;get all;enter portal;unsetsea;setsea 59;fsea;drop all;tsea;out;unsetsea}
 #alias {donateall} {ga;guild;n;donate all;s;home;leave;hc}
 #act {~^You have found %+1w!$} {wake crunch;tell crunch world drop?}
-#act {Digbicknick dealt the} {#delay {1} {ki}}
-#act {Digbicknick rushes into combat} {merc hp}
+#act {Digbicknick dealt the} {
+	#if {$deadman_active == 0} {#delay {1} {ki}}
+}
+#act {Digbicknick rushes into combat} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: merc hp - Idle exceeds 15 min limit<088>};
+	} {
+		#echo {<068>[Trigger] Sending: merc hp (Idle: $idle)<088>};
+		merc hp
+	}
+}
 
 #alias {away} {#delay {900} {#end}}
 
@@ -37,7 +46,9 @@ si;
 #alias {drains} {comtrance drain;comtrance2 absorb\;8\;np}
 
 #act {A wellspring of liquid} {blaze};
-#act {There is no beast here} {kill thorn beast};
+#act {There is no beast here} {
+	#if {$deadman_active == 0} {kill thorn beast}
+};
 #act {getreagents} {e;e;n;u;s;withdraw 30000;w;w;buy 500 ginseng;buy 500 goldenrod;buy 500 mandrake;buy 500 pine needles;e;e;deposit all;n;d;w;s;w}
 #act {getdrain} {getreagent;n;e;n;n;d;enter;ne;enter;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;study drain 100;sw;sw;gate;u;s;s;w;s;#delay {1} {powers}}
 

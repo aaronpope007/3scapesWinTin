@@ -18,6 +18,15 @@
 	#SEND forcehp;
 }{2};
 
+#NOP ***** Deadman Protection - Blocks all sends when idle > 15 min *****
+#ALIAS {safe_send} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: %0 - Idle exceeds 15 min limit<088>};
+	} {
+		#send {%0};
+	}
+}
+
 #NOP ***** Extract Raw Data *********
 #ACTION {{%*\#K\%$mip[id](.{3})(.{3})(.*)}$} {
 	#VAR {mip[source]} {%0};
@@ -92,12 +101,7 @@
 			#format {botstatus} {<128>[BOT:PAUSED]<088>};
 		}
 	} {
-		#var botstatus {};
-	};
-	#if {$keepalive_active == 1} {
-		#format {keepalivestatus} {<068>[KEEP:$keepalive_count/3]<088>};
-	} {
-		#var keepalivestatus {};
+		#format {botstatus} {<128>[BOT:OFF]<088>};
 	};
 	#if {$idle > $IdleLimit} {
 		#if {$bot_was_active == 1} {
@@ -114,7 +118,7 @@
 		#var stopreason {};
 	};
 	#if {"$draw[caption]" == "on"} {
-		#SHOWME {<088> <128>$world_cap <068>Uptime: <168>$uptime_cap  <038>Reboot: <138>$reboot_cap  <fca>Lag: <fcb>$lag_cap  <228>Idle: $idle_cap<088>  $areacap<088> $stepper $mapstatus $botstatus $keepalivestatus $idlewarning $stopreason} {19}
+		#SHOWME {<088> <128>$world_cap <068>Uptime: <168>$uptime_cap  <038>Reboot: <138>$reboot_cap  <fca>Lag: <fcb>$lag_cap  <228>Idle: $idle_cap<088>  $areacap<088> $stepper $mapstatus $botstatus $idlewarning $stopreason} {19}
 		#if {$idle > $IdleLimit} {
 			#if {$bot_was_active == 1} {
 				#SHOWME {<128>****************************************<088>} {20}
@@ -137,6 +141,8 @@
 #var IdleLimit 900
 #var idle_warned 0
 #var bot_was_active 0
+#var deadman_flash 0
+#var deadman_active 0
 #var last_input_ticks -1000
 #var tick_counter 0
 #var bot_stop_reason {}
@@ -152,15 +158,26 @@
 	}; #elseif {$idle < 600} {
 		#screen clear square 21 1 -8 1
 	};
-	#if {$idle > $IdleLimit && $idle_warned == 0} {
-		#bell;
-		#var idle_warned 1;
-		#echo {};
-		#echo {<128>****************************************<088>};
-		#echo {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>};
-		#echo {<128>*  You have been idle for 15+ minutes  *<088>};
-		#echo {<128>****************************************<088>};
-		#echo {};
+	#if {$idle > $IdleLimit} {
+		#if {$idle_warned == 0} {
+			#bell;
+			#var idle_warned 1;
+			#echo {};
+			#echo {<128>****************************************<088>};
+			#echo {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>};
+			#echo {<128>*  You have been idle for 15+ minutes  *<088>};
+			#echo {<128>****************************************<088>};
+			#echo {};
+		};
+		#var deadman_active 1;
+		#NOP Force stop all keepalives when idle limit exceeded
+		#if {$keepalive_active == 1} {
+			#unticker party_keepalive;
+			#var keepalive_active 0;
+			#echo {<128>[Keepalive] FORCE STOPPED - Idle limit exceeded<088>};
+		}
+	} {
+		#var deadman_active 0;
 	};
 	#if {$bot == 1 && $idle > $IdleLimit && $idle_warned == 1} {
 		#math {ticks_since_input} {$tick_counter - $last_input_ticks};
@@ -188,37 +205,94 @@
 	#if {$bot == 1 && "$bot_stop_reason" != ""} {
 		#var bot_stop_reason {};
 	};
+	#if {$bot != 1 && "$bot_stop_reason" != "" && $idle < 60} {
+		#var bot_stop_reason {};
+		#var bot_was_active 0;
+	};
 	update_caption
 } {1}
+
+#TICKER {deadman_warning} {
+	#if {$idle > $IdleLimit && $idle_warned == 1} {
+		#if {$deadman_flash == 0} {
+			#var deadman_flash 1;
+			#if {$bot == 1} {
+				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+			} {
+				#if {$keepalive_active == 1} {
+					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+				} {
+					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+				}
+			}
+		} {
+			#var deadman_flash 0;
+			#if {$bot == 1} {
+				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+			} {
+				#if {$keepalive_active == 1} {
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+				} {
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+				}
+			}
+		}
+	} {
+		#var deadman_flash 0;
+	}
+} {2}
 
 #EVENT {RECEIVED INPUT} {
 	#var old_idle $idle;
 	#var idle 0;
 	#var idle_warned 0;
+	#var deadman_active 0;
 	#var last_input_ticks $tick_counter;
 	#if {$bot == 1} {
 		#echo {<068>[Idle] Reset from $old_idle to 0 (Bot active, Ticks: $tick_counter)<088>};
 	};
-	#if {$keepalive_count > 0 && $keepalive_count < 3} {
-		#var keepalive_count 0;
-		#echo {<068>[Keepalive] Timer reset by user input<088>};
-		update_caption;
-	};
-	#if {$keepalive_was_active == 1 && $keepalive_active == 0} {
-		#var keepalive_active 1;
-		#var keepalive_count 0;
+	#if {$keepalive_active == 1} {
+		#unticker party_keepalive;
 		#ticker {party_keepalive} {
-			#if {$keepalive_active == 1} {
-				#if {$keepalive_count < 3} {
-					#math keepalive_count {$keepalive_count + 1};
-					#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+			#if {$idle >= $IdleLimit} {
+				#unticker party_keepalive;
+				#var keepalive_active 0;
+				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
+				update_caption;
+			} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
+					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 					#send {};
 					update_caption;
-					#if {$keepalive_count >= 3} {
+				} {
+					#if {$keepalive_active == 0} {
 						#unticker party_keepalive;
-						#var keepalive_active 0;
-						#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
-						update_caption;
+					}
+				}
+			}
+		} {299};
+		#echo {<068>[Keepalive] Timer reset by user input (299s countdown restarted)<088>};
+		update_caption;
+	};
+	#if {$keepalive_active == 0} {
+		#var keepalive_active 1;
+		#var keepalive_was_active 1;
+		#ticker {party_keepalive} {
+			#if {$idle >= $IdleLimit} {
+				#unticker party_keepalive;
+				#var keepalive_active 0;
+				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
+				update_caption;
+			} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
+					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
+					#send {};
+					update_caption;
+				} {
+					#if {$keepalive_active == 0} {
+						#unticker party_keepalive;
 					}
 				}
 			}
@@ -226,10 +300,9 @@
 		#echo {<068>[Keepalive] Auto-restarted after user input<088>};
 		update_caption;
 	};
-	#if {$bot != 1} {
+	#if {$bot != 1 && $bot_was_active == 1} {
 		#var bot 1;
 		#var autokill 1;
-		#var bot_was_active 1;
 		#var idle_warned 0;
 		#var bot_stop_reason {};
 		#echo {<068>[Bot] Auto-restarted after user input<088>};
@@ -240,29 +313,36 @@
 }
 
 #TICKER {keepalive} {
-	#if {$bot == 1 && $idle < $IdleLimit} {
-		#echo {<068>[Keepalive] Sending keepalive signal (Idle: $idle / $IdleLimit)<088>};
-		#send {}
+	#if {$idle >= $IdleLimit} {
+		#echo {<128>[Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
+	} {
+		#if {$bot == 1 && $idle < $IdleLimit} {
+			#echo {<068>[Keepalive] Sending keepalive signal (Idle: $idle / $IdleLimit)<088>};
+			#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
+			#send {}
+		}
 	}
 } {299}
 
-#NOP Standalone keepalive for party mode (works without bot)
-#var keepalive_active 0
+#NOP Standalone keepalive for party mode (works without bot) - Auto-starts by default
+#var keepalive_active 1
 #var keepalive_count 0
-#var keepalive_was_active 0
-
-#TICKER {party_keepalive} {
-	#if {$keepalive_active == 1} {
-		#if {$keepalive_count < 3} {
-			#math keepalive_count {$keepalive_count + 1};
-			#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+#var keepalive_was_active 1
+#ticker {party_keepalive} {
+	#if {$idle >= $IdleLimit} {
+		#unticker party_keepalive;
+		#var keepalive_active 0;
+		#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
+		update_caption;
+	} {
+		#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+			#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
+			#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 			#send {};
 			update_caption;
-			#if {$keepalive_count >= 3} {
+		} {
+			#if {$keepalive_active == 0} {
 				#unticker party_keepalive;
-				#var keepalive_active 0;
-				#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
-				update_caption;
 			}
 		}
 	}
@@ -274,29 +354,31 @@
 		#var keepalive_active 0;
 		#var keepalive_count 0;
 		#var keepalive_was_active 0;
-		#echo {<128>Party keepalive stopped<088>};
+		#echo {<128>Party keepalive stopped (will auto-restart on next input)<088>};
 		update_caption;
 	} {
 		#var keepalive_active 1;
-		#var keepalive_count 0;
 		#var keepalive_was_active 1;
 		#ticker {party_keepalive} {
-			#if {$keepalive_active == 1} {
-				#if {$keepalive_count < 3} {
-					#math keepalive_count {$keepalive_count + 1};
-					#echo {<068>[Party Keepalive] Sending keepalive ($keepalive_count/3)<088>};
+			#if {$idle >= $IdleLimit} {
+				#unticker party_keepalive;
+				#var keepalive_active 0;
+				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
+				update_caption;
+			} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
+					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 					#send {};
 					update_caption;
-					#if {$keepalive_count >= 3} {
+				} {
+					#if {$keepalive_active == 0} {
 						#unticker party_keepalive;
-						#var keepalive_active 0;
-						#echo {<128>[Party Keepalive] Stopped after 3 sends. Will auto-restart on next input<088>};
-						update_caption;
 					}
 				}
 			}
 		} {299};
-		#echo {<068>Party keepalive started (will send 3 times, auto-restarts on input)<088>};
+		#echo {<068>Party keepalive started (sends every 299s, stops at 15min idle)<088>};
 		update_caption;
 	}
 }
