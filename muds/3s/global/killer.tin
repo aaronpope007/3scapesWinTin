@@ -721,16 +721,16 @@ make_global_blacklist
         #echo {<128>[DEADMAN] BLOCKED: kill-loop - Idle exceeds 15 min limit<088>};
         #return;
     };
-    #if {$kill_loop_running == 1} {
-        #echo {<128>[Kill-Loop] Already running, skipping duplicate call<088>};
-        #return;
-    };
-    #var kill_loop_running 1;
     #if {${player_room} == 0}{ 
         #if {${critter_room} > 0}{
                 #var domove2 0;
                 #if {$autokill == 1}{
                     #if {${critter_room} != $last_killed_critter} {
+                        #if {$kill_loop_running == 1} {
+                            #echo {<128>[Kill-Loop] Kill already sent recently, skipping duplicate<088>};
+                            #return;
+                        };
+                        #var kill_loop_running 1;
                         #var last_killed_critter ${critter_room};
                         #if { $csea == 1 } {
                             #echo {<068>[Kill-Loop] Sending: kill mutant (Critter: ${critter_room})<088>};
@@ -739,6 +739,7 @@ make_global_blacklist
                             #echo {<068>[Kill-Loop] Sending: kill $kstr (Critter: ${critter_room})<088>};
                             kill $kstr;
                         }
+                        #delay {0.5} {#var kill_loop_running 0};
                     } {
                         #echo {<128>[Kill-Loop] Already killed critter ${critter_room}, skipping<088>};
                     }
@@ -751,7 +752,6 @@ make_global_blacklist
         #var last_killed_critter 0;
         step_function;
     };
-    #delay {0.5} {#var kill_loop_running 0};
 }
 #alias dir_selection {
 	#var good_dir 0;
