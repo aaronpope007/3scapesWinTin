@@ -218,10 +218,16 @@
 			#var deadman_flash 1;
 			#if {$bot == 1} {
 				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
 			} {
 				#if {$keepalive_active == 1} {
 					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
 				} {
+					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
 					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
 				}
 			}
@@ -229,10 +235,16 @@
 			#var deadman_flash 0;
 			#if {$bot == 1} {
 				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
 			} {
 				#if {$keepalive_active == 1} {
 					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
 				} {
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
 					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
 				}
 			}
