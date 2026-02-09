@@ -11,51 +11,34 @@ si;
 
 #alias {kidonates} {#var kicount 0;#ticker {kirundonates} {ki;#math {kicount} {$kicount + 1};#if {$kicount >= 90} {#unticker kirundonates}} {10}}
 
-#alias {away} {#delay {900} {#endsea}}
+#alias {away} {#delay {890} {#end}}
 
 
 #alias {blasts} {cb;ab;cb;ab;cb;ab;cb;ab;cb;ab;pav;give all to mass;give all to giant;give all to mutant;give all to einherjer;give all to human}
 
 #act {There is no beast here} {
-	#if {$deadman_active == 0} {kill thorn beast}
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: kill thorn beast - Idle exceeds 15 min limit<088>};
+	} {
+		kill thorn beast;
+	}
 };
-#act {Phenomenon pokes you} {
-	#if {$deadman_active == 0} {passist always phenomenon;partyrole wuss;follow phenomenon}
-}
+#act {Phenomenon pokes you} {passist always phenomenon;partyrole wuss;follow phenomenon}
 
-#act {You attack} {
-	#if {$deadman_active == 0} {evoke age;gouge}
-};
-#act {You are now seeking to achieve equipollence.} {
-	#if {$deadman_active == 0} {p equipollent is ON}
-};
-#act {You are no longer seeking to achieve equipollence.} {
-	#if {$deadman_active == 0} {p equipollent is OFF}
-};
-#act {Bag of Major Sending: Ok.} {
-	#if {$deadman_active == 0} {put bag in vortex}
-};
-#act {Gswap was successful.} {
-	#if {$deadman_active == 0} {evoke autodrain}
-};
-#act {turn off equi} {
-	#if {$deadman_active == 0} {evoke equipollent}
-};
-#act {Hayt joins the party.} {
-	#if {$deadman_active == 0} {partyrole wuss;passist always rictor;follow rictor}
-};
-#act {You arrive at the Sea of Chaos.} {
-	#if {$deadman_active == 0} {#delay {3600} {wake hayt;tell hayt -=> You can reset sea!}}
-};
-#act {Digbicknick dealt the} {
-	#if {$deadman_active == 0} {#delay {1} {ki}}
-}
+#act {You attack} {evoke age;gouge};
+#act {You are now seeking to achieve equipollence.} {p equipollent is ON};
+#act {You are no longer seeking to achieve equipollence.} {p equipollent is OFF};
+#act {Bag of Major Sending: Ok.} {put bag in vortex};
+#act {Gswap was successful.} {evoke autodrain};
+#act {turn off equi} {evoke equipollent};
+#act {Hayt joins the party.} {partyrole wuss;passist always rictor;follow rictor};
+#act {You arrive at the Sea of Chaos.} {#delay {3600} {wake hayt;tell hayt -=> You can reset sea!}}
+#act {Digbicknick dealt the} {#delay {1} {ki}}
 #act {Digbicknick rushes into combat} {
 	#if {$deadman_active == 1} {
 		#echo {<128>[DEADMAN] BLOCKED: merc hp - Idle exceeds 15 min limit<088>};
 	} {
-		#echo {<068>[Trigger] Sending: merc hp (Idle: $idle)<088>};
-		merc hp
+		merc hp;
 	}
 }
 
@@ -92,20 +75,9 @@ si;
 
 
 #NOP AREA TRIGGERS FOR LEADING/KILLING
-#act {Castiel dealt} {
-	#if {$deadman_active == 0} {#delay {1} {ki}}
-}
-#act {Pit fiend dealt} {
-	#if {$deadman_active == 0} {#delay {1} {ki}}
-}
-#act {Hayt dealt the killing blow} {
-	#if {$deadman_active == 0} {
-		#echo {<068>[Kill Trigger] Fired - calling ki to continue bot<088>};
-		#delay {1} {ki}
-	} {
-		#echo {<128>[DEADMAN] BLOCKED: ki - Idle exceeds 15 min limit<088>};
-	}
-}
+#act {Castiel dealt} {#delay {1} {ki}}
+#act {Pit fiend dealt} {#delay {1} {ki}}
+#act {Hayt dealt the killing blow} {#echo {<068>[Kill Trigger] Fired - calling ki to continue bot<088>};#delay {1} {ki}}
 
 
 

@@ -29,7 +29,7 @@ si;
 	}
 }
 
-#alias {away} {#delay {900} {#end}}
+#alias {away} {#delay {890} {#end}}
 
 #alias {delay1} {kigxp;#delay {900} {kigxp;gs}}
 #alias {delay2} {kigxp;delay1;#delay {1800} {kigxp;gwho}}

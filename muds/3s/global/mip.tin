@@ -27,6 +27,37 @@
 	}
 }
 
+#ALIAS {.testdeadman} {
+	#echo {<068>Testing deadman system...<088>};
+	#echo {<068>Setting idle to 901 seconds (above 15 min limit)...<088>};
+	#var idle 901;
+	#var idle_warned 0;
+	#var deadman_active 1;
+	#echo {<068>Deadman condition simulated. You should see:<088>};
+	#echo {<068>  - Beep sound (at 14:30)<088>};
+	#echo {<068>  - Flashing red warning messages (3 lines, every 2 seconds)<088>};
+	#echo {<068>  - Status bar showing deadman status<088>};
+	#echo {<068>Type '.resetidle' to reset and stop the test<088>};
+}
+#ALIAS {.testwarning} {
+	#echo {<068>Testing warning beep at 14:30...<088>};
+	#echo {<068>Setting idle to 871 seconds (above 14:30 warning threshold)...<088>};
+	#var idle 871;
+	#var idle_warned 0;
+	#var deadman_active 0;
+	#echo {<068>Warning condition simulated. You should see:<088>};
+	#echo {<068>  - Beep sound<088>};
+	#echo {<068>  - Warning message about 30 seconds remaining<088>};
+	#echo {<068>  - Status bar showing warning<088>};
+	#echo {<068>Type '.resetidle' to reset and stop the test<088>};
+}
+#ALIAS {.resetidle} {
+	#var idle 0;
+	#var idle_warned 0;
+	#var deadman_active 0;
+	#echo {<068>Idle reset - deadman test stopped<088>};
+}
+
 #NOP ***** Extract Raw Data *********
 #ACTION {{%*\#K\%$mip[id](.{3})(.{3})(.*)}$} {
 	#VAR {mip[source]} {%0};
@@ -110,7 +141,11 @@
 			#format {idlewarning} {<128>[IDLE WARNING]<088>};
 		}
 	} {
-		#var idlewarning {};
+		#if {$idle > $IdleWarningThreshold} {
+			#format {idlewarning} {<128>[WARNING: 30s LEFT]<088>};
+		} {
+			#var idlewarning {};
+		}
 	};
 	#if {"$bot_stop_reason" != ""} {
 		#format {stopreason} {<128>[$bot_stop_reason]<088>};
@@ -130,15 +165,22 @@
 				#SHOWME {<128>****************************************<088>} {22}
 			}
 		} {
-			#SHOWME {<088>} {20}
-			#SHOWME {<088>} {21}
-			#SHOWME {<088>} {22}
+			#if {$idle > $IdleWarningThreshold} {
+				#SHOWME {<128>****************************************<088>} {20}
+				#SHOWME {<128>*  WARNING: IDLE TIME APPROACHING 15 MIN  *<088>} {21}
+				#SHOWME {<128>*  30 seconds until bot stops!          *<088>} {22}
+			} {
+				#SHOWME {<088>} {20}
+				#SHOWME {<088>} {21}
+				#SHOWME {<088>} {22}
+			}
 		}
 	};
 }
 
 #var clockon 0
 #var IdleLimit 900
+#var IdleWarningThreshold 870
 #var idle_warned 0
 #var bot_was_active 0
 #var deadman_flash 0
@@ -158,24 +200,27 @@
 	}; #elseif {$idle < 600} {
 		#screen clear square 21 1 -8 1
 	};
-	#if {$idle > $IdleLimit} {
+	#if {$idle > $IdleWarningThreshold} {
 		#if {$idle_warned == 0} {
 			#bell;
 			#var idle_warned 1;
 			#echo {};
 			#echo {<128>****************************************<088>};
-			#echo {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>};
-			#echo {<128>*  You have been idle for 15+ minutes  *<088>};
+			#echo {<128>*  WARNING: IDLE TIME APPROACHING 15 MIN  *<088>};
+			#echo {<128>*  You have been idle for 14:30 minutes  *<088>};
+			#echo {<128>*  Bot will stop in 30 seconds!          *<088>};
 			#echo {<128>****************************************<088>};
 			#echo {};
 		};
+	};
+	#if {$idle > $IdleLimit} {
 		#var deadman_active 1;
 		#NOP Force stop all keepalives when idle limit exceeded
 		#if {$keepalive_active == 1} {
 			#unticker party_keepalive;
 			#var keepalive_active 0;
 			#echo {<128>[Keepalive] FORCE STOPPED - Idle limit exceeded<088>};
-		}
+		};
 	} {
 		#var deadman_active 0;
 	};
@@ -272,14 +317,18 @@
 				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
 				update_caption;
 			} {
-				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit && $deadman_active == 0} {
 					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
 					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 					#send {};
 					update_caption;
 				} {
-					#if {$keepalive_active == 0} {
-						#unticker party_keepalive;
+					#if {$deadman_active == 1} {
+						#echo {<128>[Party Keepalive] BLOCKED - Deadman active<088>};
+					} {
+						#if {$keepalive_active == 0} {
+							#unticker party_keepalive;
+						}
 					}
 				}
 			}
@@ -297,14 +346,18 @@
 				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
 				update_caption;
 			} {
-				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit && $deadman_active == 0} {
 					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
 					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 					#send {};
 					update_caption;
 				} {
-					#if {$keepalive_active == 0} {
-						#unticker party_keepalive;
+					#if {$deadman_active == 1} {
+						#echo {<128>[Party Keepalive] BLOCKED - Deadman active<088>};
+					} {
+						#if {$keepalive_active == 0} {
+							#unticker party_keepalive;
+						}
 					}
 				}
 			}
@@ -320,7 +373,7 @@
 		#echo {<068>[Bot] Auto-restarted after user input<088>};
 		update_caption;
 		#NOP Always resume movement when bot restarts
-		#delay {0.5} {ki}
+		#delay {0.5} {ki};
 	}
 }
 
@@ -328,10 +381,14 @@
 	#if {$idle >= $IdleLimit} {
 		#echo {<128>[Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
 	} {
-		#if {$bot == 1 && $idle < $IdleLimit} {
+		#if {$bot == 1 && $idle < $IdleLimit && $deadman_active == 0} {
 			#echo {<068>[Keepalive] Sending keepalive signal (Idle: $idle / $IdleLimit)<088>};
 			#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 			#send {}
+		} {
+			#if {$deadman_active == 1} {
+				#echo {<128>[Keepalive] BLOCKED - Deadman active<088>};
+			}
 		}
 	}
 } {299}
@@ -347,14 +404,18 @@
 		#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
 		update_caption;
 	} {
-		#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+		#if {$keepalive_active == 1 && $idle < $IdleLimit && $deadman_active == 0} {
 			#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
 			#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 			#send {};
 			update_caption;
 		} {
-			#if {$keepalive_active == 0} {
-				#unticker party_keepalive;
+			#if {$deadman_active == 1} {
+				#echo {<128>[Party Keepalive] BLOCKED - Deadman active<088>};
+			} {
+				#if {$keepalive_active == 0} {
+					#unticker party_keepalive;
+				}
 			}
 		}
 	}
@@ -378,14 +439,18 @@
 				#echo {<128>[Party Keepalive] STOPPED - Idle $idle exceeds limit $IdleLimit - NO COMMANDS SENT<088>};
 				update_caption;
 			} {
-				#if {$keepalive_active == 1 && $idle < $IdleLimit} {
+				#if {$keepalive_active == 1 && $idle < $IdleLimit && $deadman_active == 0} {
 					#echo {<068>[Party Keepalive] Sending keepalive (Idle: $idle / $IdleLimit)<088>};
 					#echo {<128>*** SENDING CARRIAGE RETURN ***<088>};
 					#send {};
 					update_caption;
 				} {
-					#if {$keepalive_active == 0} {
-						#unticker party_keepalive;
+					#if {$deadman_active == 1} {
+						#echo {<128>[Party Keepalive] BLOCKED - Deadman active<088>};
+					} {
+						#if {$keepalive_active == 0} {
+							#unticker party_keepalive;
+						}
 					}
 				}
 			}

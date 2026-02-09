@@ -24,7 +24,11 @@
 }
 
 #act {You will no longer see the HP bar on the main screen.}{
-	!forcehp;
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: forcehp - Idle exceeds 15 min limit<088>};
+	} {
+		!forcehp;
+	}
 };
 
 

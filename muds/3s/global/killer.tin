@@ -630,6 +630,10 @@ make_global_blacklist
 
 
 #alias {step_function}{
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: step_function - Idle exceeds 15 min limit<088>};
+		#return;
+	};
 	#if {$debug_stepper == 1}{
 		#echo {using Stepper mode $stepper2 - Queeuing is $autoqueue - Domove is $domove2 - do_queue is $do_queue2};
 		#echo {Room index is $room_index - Path index is $path_index};

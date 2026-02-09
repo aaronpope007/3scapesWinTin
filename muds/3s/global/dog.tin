@@ -29,9 +29,33 @@
 #act {woofs at you} {!dog stay}
 #act {You woof.$} {!dog stay}
 #act {woofs.$} {!dog stay}
-#act {Your dog lays down and places his head on his paws, looking sad\.$} {!say Kerensky is staying here.}
-#act {Your dog is so happy he can hardly stand it and runs around in circles\.$} {!say Kerensky is following me.}
-#act {Your dog looks disappointed, but slowly moves behind you\.$} {!say Kerensky is no longer assisting me in combat.}
-#act {Your dog is so happy he can hardly stand it and bounds in front of you\.$} {!say Kerensky is now assisting me in combat.}
+#act {Your dog lays down and places his head on his paws, looking sad\.$} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: say Kerensky is staying here - Idle exceeds 15 min limit<088>};
+	} {
+		!say Kerensky is staying here.;
+	}
+}
+#act {Your dog is so happy he can hardly stand it and runs around in circles\.$} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: say Kerensky is following me - Idle exceeds 15 min limit<088>};
+	} {
+		!say Kerensky is following me.;
+	}
+}
+#act {Your dog looks disappointed, but slowly moves behind you\.$} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: say Kerensky is no longer assisting me in combat - Idle exceeds 15 min limit<088>};
+	} {
+		!say Kerensky is no longer assisting me in combat.;
+	}
+}
+#act {Your dog is so happy he can hardly stand it and bounds in front of you\.$} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: say Kerensky is now assisting me in combat - Idle exceeds 15 min limit<088>};
+	} {
+		!say Kerensky is now assisting me in combat.;
+	}
+}
 
 #class {dog} {close}
