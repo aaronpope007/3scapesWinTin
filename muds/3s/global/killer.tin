@@ -578,7 +578,11 @@ make_global_blacklist
 		#if {"$guild" == "angel" && $my[desecrate] == 1}{
 			!cease;
 		};
-		glance;
+		#if {$deadman_active == 1} {
+			#echo {<128>[DEADMAN] BLOCKED: glance - Idle exceeds 15 min limit<088>};
+		} {
+			glance;
+		}
 	};
 }
 

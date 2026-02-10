@@ -10,8 +10,22 @@
 #gag {You lose control of the scouring forces, and astral fires rip through you!}
 
 #gag {The world suddenly seems darker, a velvet blackness.}
-#act {It is too dark}{!cast moon ribbon;glance}
-#act {There is darkness as %1 goes dark}{!cast moon ribbon;glance}
+#act {It is too dark}{
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: cast moon ribbon;glance - Idle exceeds 15 min limit<088>};
+	} {
+		!cast moon ribbon;
+		glance;
+	}
+}
+#act {There is darkness as %1 goes dark}{
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: cast moon ribbon;glance - Idle exceeds 15 min limit<088>};
+	} {
+		!cast moon ribbon;
+		glance;
+	}
+}
 #act {The Astral Matrix unravels, energies untwining from your summons.}{
 	#var {my[matrix][status]}{0};
 };

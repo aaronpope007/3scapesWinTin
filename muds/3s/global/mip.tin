@@ -141,8 +141,9 @@
 			#format {idlewarning} {<128>[IDLE WARNING]<088>};
 		}
 	} {
-		#if {$idle > $IdleWarningThreshold} {
-			#format {idlewarning} {<128>[WARNING: 30s LEFT]<088>};
+		#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
+			#math {seconds_left} {$IdleLimit - $idle};
+			#format {idlewarning} {<128>[WARNING: $seconds_left s LEFT]<088>};
 		} {
 			#var idlewarning {};
 		}
@@ -165,10 +166,11 @@
 				#SHOWME {<128>****************************************<088>} {22}
 			}
 		} {
-			#if {$idle > $IdleWarningThreshold} {
+			#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
+				#math {seconds_left} {$IdleLimit - $idle};
 				#SHOWME {<128>****************************************<088>} {20}
 				#SHOWME {<128>*  WARNING: IDLE TIME APPROACHING 15 MIN  *<088>} {21}
-				#SHOWME {<128>*  30 seconds until bot stops!          *<088>} {22}
+				#SHOWME {<128>*  $seconds_left seconds until bot stops!  *<088>} {22}
 			} {
 				#SHOWME {<088>} {20}
 				#SHOWME {<088>} {21}
