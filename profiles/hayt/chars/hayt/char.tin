@@ -8,7 +8,7 @@ si;
 #var csea 1;
 #remember, go seacask goes to the cask... duh
 
-#alias longdelay {#delay {299} {#send {}};#delay {595} {#send {}};#delay {797} {#send {}};#delay {595} {#send {1055}};#delay {1354} {#send {}};#delay {1640} {#send {}};#delay {1931} {#send {}};#delay {2200} {#send {}};#delay {2469} {#send {}};
+#alias longdelay {#delay {299} {#send {}};#delay {595} {#send {}};#delay {797} {#send {}};#delay {595} {#send {1055}};#delay {1354} {#send {}};#delay {1640} {#send {}};#delay {1931} {#send {}};#delay {2200} {#send {}};#delay {2469} {#send {}}};
 
 #act {%*twirl%*around%*} {
 	#if {$twirl_sent == 1} {#return};
