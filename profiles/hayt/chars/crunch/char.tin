@@ -9,14 +9,14 @@ si;
 
 #act {You only have} {co;drain}
 
-#alias {tgiants} {fantasy;portal ice;s;s;e;e;e;e;e;n;e;e;s;e;e;read runes;n;n;nw;nw;n;n;climb over logs;n;n;squeeze between poles;n;n;n;n;n;n;n;n;e;e;e;n;n;climb down };
-#alias {fgiants} {climb up;s;s;w;w;w;s;s;s;s;s;s;s;s;s;s;se;s;s;se;se;s;s;leave;w;w;n;w;w;s;w;w;w;w;w;n;n;portal;home;dmg fire};
+#alias {tgiants} {fantasy;portal ice;s;s;e;e;e;e;e;n;e;e;s;e;e;read runes;n;ne;e;e;ne;e;e;path;n;n;nw;nw;n;n;climb over logs;n;n;squeeze between poles;n;n;n;n;n;n;n;n;e;e;e;n;n;climb down;dmg magical};
+#alias {fgiants} {climb up;s;s;w;w;w;s;s;s;s;s;s;s;s;s;s;se;s;s;se;se;s;s;leave;w;w;sw;w;w;sw;s;leave;w;w;n;w;w;s;w;w;w;w;w;n;n;portal;home;dmg fire};
 #alias {tsea} {chaos;enter;e;e;e;s;s;e;e;n;e;e;e;s;s;lick ooze};
 #alias {fsea} {out;n;n;w;w;w;s;w;w;n;n;w;w;w;vortex;home;shop;w;n;n;deposit all;s;s;e;home;leave;hc};
 #alias {tsewer} {chaos;enter;e;e;s;leap over ditch;e;exa hole;n;n;e;e;e;e;n;n;n;enter};
 #alias {endsea} {open cask;get all;enter portal;unsetsea;setsea 59;fsea;drop all;tsea;out;unsetsea}
 #alias {donateall} {ga;guild;n;donate all;s;home;leave;hc}
-#act {~^You have found %+1w!$} {wake crunch;tell crunch world drop?}
+#act {~^You have found %+1w!$} {#bell;tell crunch world drop?}
 #act {Digbicknick dealt the} {
 	#if {$deadman_active == 0} {#delay {1} {ki}}
 }
@@ -40,7 +40,7 @@ si;
 
 #alias {twentymindelay} {#delay {280} {xp};#delay {563} {gs};#delay {855} {members};#delay {1120} {massxp}};
 #alias {fortymindelay} {twentymindelay;#delay {1401} {gs2};#delay {1654} {gwho};#delay {1943} {xp};#delay {2230} {i}};
-#alias {partydelay} {fortymindelay;#delay {2515} {pwho};#delay {2807} {gwho};#delay {3100} {members};#delay {3391} {gs;wake hayt}};
+#alias {partydelay} {fortymindelay;#delay {2515} {pwho};#delay {2807} {gwho};#delay {3100} {members};#delay {3391} {gs;#bell}};
 
 #alias {invokes} {comtrance invoke edged;comtrance2 absorb\;10\;sp}
 #alias {drains} {comtrance drain;comtrance2 absorb\;8\;np}

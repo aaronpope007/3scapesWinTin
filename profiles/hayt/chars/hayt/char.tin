@@ -8,11 +8,46 @@ si;
 #var csea 1;
 #remember, go seacask goes to the cask... duh
 
+#alias longdelay {#delay {299} {#send {}};#delay {595} {#send {}};#delay {797} {#send {}};#delay {595} {#send {1055}};#delay {1354} {#send {}};#delay {1640} {#send {}};#delay {1931} {#send {}};#delay {2200} {#send {}};#delay {2469} {#send {}};
+
+#act {%*twirl%*around%*} {
+	#if {$twirl_sent == 1} {#return};
+	#var twirl_sent 1;
+	#send {ee};
+	#delay {2} {#var twirl_sent 0};
+};
+
+#act {%1 nudges you.} {
+	#if {$nudge_sent == 1} {#return};
+	#var nudge_sent 1;
+	#delay {5} {#var nudge_sent 0};
+	#var person %1;
+	#format person {%l} $person;
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: nudge response - Idle exceeds 15 min limit<088>};
+	} {
+		follow $person;
+		passist always $person;
+		salute $person;
+		#if {$my[equip] == "on"} n{
+			evoke equipollent as off;
+			#var my[equip] off;
+			say AOE IS TURNED OFF GOOD SIR!
+		};
+		#elseif {$my[equip] == "off"} {
+			evoke equipollent as on;
+			#var my[equip] on;
+			say AOE IS TURNED ON GOOD SIR!
+		};
+	};
+};
 
 #alias {kidonates} {#var kicount 0;#ticker {kirundonates} {ki;#math {kicount} {$kicount + 1};#if {$kicount >= 90} {#unticker kirundonates}} {10}}
 
 #alias {away} {#delay {890} {#end}}
 
+#act {[PARTY] Timmy: aoe ON} {ee}
+#act {[PARTY] Timmy: aoe OFF} {ee}
 
 #alias {blasts} {cb;ab;cb;ab;cb;ab;cb;ab;cb;ab;pav;give all to mass;give all to giant;give all to mutant;give all to einherjer;give all to human}
 
@@ -26,13 +61,13 @@ si;
 #act {Phenomenon pokes you} {passist always phenomenon;partyrole wuss;follow phenomenon}
 
 #act {You attack} {evoke age;gouge};
-#act {You are now seeking to achieve equipollence.} {p equipollent is ON};
-#act {You are no longer seeking to achieve equipollence.} {p equipollent is OFF};
+#act {You are now seeking to achieve equipollence.} {#var my[equip] on;p equipollent is ON};
+#act {You are no longer seeking to achieve equipollence.} {#var my[equip] off;p equipollent is OFF};
 #act {Bag of Major Sending: Ok.} {put bag in vortex};
 #act {Gswap was successful.} {evoke autodrain};
 #act {turn off equi} {evoke equipollent};
 #act {Hayt joins the party.} {partyrole wuss;passist always rictor;follow rictor};
-#act {You arrive at the Sea of Chaos.} {#delay {3600} {wake hayt;tell hayt -=> You can reset sea!}}
+#act {You arrive at the Sea of Chaos.} {#delay {3600} {#bell;tell hayt -=> You can reset sea!}}
 #act {Digbicknick dealt the} {#delay {1} {ki}}
 #act {Digbicknick rushes into combat} {
 	#if {$deadman_active == 1} {
@@ -42,7 +77,7 @@ si;
 	}
 }
 
-#act {You have become size} {p wow look at me! glvl!};
+
 #act {%1 raspberries you!} {
   #echo {Rally trigger!!!};
   #bell;
@@ -52,12 +87,12 @@ si;
 
 #alias {defenseup} {defense slashing;defense crushing;defense ice;defense fire;defense acid;defense shocking;defense mental;defense magical;defense toxic;defense radiation};
 
-#alias {tgiants} {fantasy;portal ice;s;s;e;e;e;e;e;n;e;e;s;e;e;read runes;n;n;nw;nw;n;n;climb over logs;n;n;squeeze between poles;n;n;n;n;n;n;n;n;e;e;e;n;n;climb down;dmg magical};
-#alias {fgiants} {climb up;s;s;w;w;w;s;s;s;s;s;s;s;s;s;s;se;s;s;se;se;s;s;leave;w;w;n;w;w;s;w;w;w;w;w;n;n;portal;home;dmg fire};
+#alias {tgiants} {fantasy;portal ice;s;s;e;e;e;e;e;n;e;e;s;e;e;read runes;n;ne;e;e;ne;e;e;path;n;n;nw;nw;n;n;climb over logs;n;n;squeeze between poles;n;n;n;n;n;n;n;n;e;e;e;n;n;climb down;dmg magical};
+#alias {fgiants} {climb up;s;s;w;w;w;s;s;s;s;s;s;s;s;s;s;se;s;s;se;se;s;s;leave;w;w;sw;w;w;sw;s;leave;w;w;n;w;w;s;w;w;w;w;w;n;n;portal;home;dmg fire};
 #alias {tsea} {chaos;enter;e;e;e;s;s;e;e;n;e;e;e;s;s;lick ooze;dmg acid;enter sea;los};
 #alias {fsea} {out;n;n;w;w;w;s;w;w;n;n;w;w;w;vortex;home;shop;w;n;n;deposit all;s;s;e;home;leave;hc;dmg fire};
 #alias {endsea} {open cask;get all;enter portal;unsetsea;setsea 59;fsea;drop all;tsea;out;unsetsea}
-#alias {tsewer} {chaos;enter;e;e;s;leap over ditch;e;exa hole;n;n;e;e;e;e;n;n;n;enter;dmg mental};
+#alias {tsewer} {#var csea 0;chaos;enter;e;e;s;leap over ditch;e;exa hole;n;n;e;e;e;e;n;n;n;enter;dmg mental};
 #alias {tunderdark} {fantasy;pe;e;e;e;e;e;s;s;s;s;s;s;s;s;w;w;w;w;w;s;s;s;s;s;s;w;w;s}
 #alias {fdump} {u;w;w;sw;s;s;s;u;u;u;out;e;e;n;n;n;n;n;n;e;e;e;e;e;n;n;n;n;n;n;n;n;w;w;w;w;w;portal;home;leave;hc}
 #dalias {tdump} {n;n;n;ne;e;e;d}
@@ -71,7 +106,7 @@ si;
 
 #act {The time stone is becoming unstable} {drop stone}
 #act {The traveler arrives at its destination.} {exit}
-#act {~^You have found %+1w!$} {wake hayt;tell hayt world drop?}
+#act {~^You have found %+1w!$} {#bell;tell hayt world drop?}
 
 
 #NOP AREA TRIGGERS FOR LEADING/KILLING
