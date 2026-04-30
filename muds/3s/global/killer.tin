@@ -41,6 +41,7 @@ make_global_blacklist
 
 #var kill_loop_running 0
 #var last_killed_critter 0
+#var killname {}
 #var {areaselector[rows]}{6}
 #var {areaselector[page]}{1};
 #var {areaselector[max]}{6};
@@ -57,6 +58,17 @@ make_global_blacklist
 		show_area_selector;
 	};
 };
+
+#alias {killname} {
+	#var {killname}{%0};
+	#if {"$killname" == ""} {
+		#echo {<128>[Kill-Loop] Kill target override cleared<088>};
+	} {
+		#echo {<128>[Kill-Loop] Kill target override set to: $killname<088>};
+	};
+};
+
+#alias {clearkillname} {killname};
 
 #alias {.stop} {
 	#var bot 0;
@@ -740,13 +752,18 @@ make_global_blacklist
                         };
                         #var kill_loop_running 1;
                         #var last_killed_critter ${critter_room};
-                        #if { $csea == 1 } {
-                            #echo {<068>[Kill-Loop] Sending: kill mutant (Critter: ${critter_room})<088>};
-                            !kill mutant;
+                        #if {"$killname" != ""} {
+                            #echo {<068>[Kill-Loop] Sending: kill $killname (override) (Critter: ${critter_room})<088>};
+                            kill $killname;
                         }{
-                            #echo {<068>[Kill-Loop] Sending: kill $kstr (Critter: ${critter_room})<088>};
-                            kill $kstr;
-                        }
+                            #if { $csea == 1 } {
+                                #echo {<068>[Kill-Loop] Sending: kill mutant (Critter: ${critter_room})<088>};
+                                !kill mutant;
+                            }{
+                                #echo {<068>[Kill-Loop] Sending: kill $kstr (Critter: ${critter_room})<088>};
+                                kill $kstr;
+                            };
+                        };
                         #delay {0.5} {#var kill_loop_running 0};
                     } {
                         #echo {<128>[Kill-Loop] Already killed critter ${critter_room}, skipping<088>};
