@@ -1,6 +1,87 @@
-#class {fluubit} {open}
+#class {hayt} {open}
 
 #var guild priest
+
+#var {my[reverence][auto]} {0}
+#var {my[reverence][idle_max]} {60}
+#var {my[combat][start_cooldown]} {0}
+#var {my[combat][summon_cooldown]} {0}
+
+#alias {ensure_summons} {
+	#if {$deadman_active == 1} { #return };
+	#if {$my[combat][summon_cooldown] == 1} { #return };
+	#var {my[combat][summon_cooldown]} {1};
+	!psummon;
+	ps;
+	#delay {20} {#var {my[combat][summon_cooldown]} {0}};
+};
+
+#alias {revon} {
+	#var {my[reverence][auto]} {1};
+	#ticker {auto_reverence} {auto_reverence} {60};
+	#echo {<128>[Priest] Auto-reverence ON (every 60s when idle <= $my[reverence][idle_max])<088>};
+};
+
+#alias {revoff} {
+	#var {my[reverence][auto]} {0};
+	#unticker {auto_reverence};
+	#echo {<128>[Priest] Auto-reverence OFF<088>};
+};
+
+#alias {revidle} {
+	#if {"%0" == ""} {
+		#echo {<128>[Priest] Auto-reverence idle threshold is $my[reverence][idle_max] seconds<088>};
+	} {
+		#var {my[reverence][idle_max]} {%0};
+		#echo {<128>[Priest] Auto-reverence will send when idle <= $my[reverence][idle_max] seconds<088>};
+	};
+};
+
+#alias {auto_reverence} {
+	#if {$my[reverence][auto] != 1} { #return };
+	#if {$deadman_active == 1} { #return };
+	#if {"$idle" == ""} { #return };
+	#if {$idle > $my[reverence][idle_max]} { #return };
+	reverence;
+};
+
+#alias {gs} {gscore};
+#alias {gs2} {gscore2};
+#alias {info} {priest};
+
+#var {mytt_damage_last} 0;
+#var {mytt_damage_total} 0;
+#var {mytt_damage_rounds} 0;
+#var {mytt_damage_avg} 0;
+#var {mytt_damage_high} 0;
+#var {mytt_damage_low} 0;
+
+#act {You hit %* %d time%* for %d damage.} {
+  #var {mytt_damage_last} {%4};
+  #math {mytt_damage_total} {$mytt_damage_total + %4};
+  #math {mytt_damage_rounds} {$mytt_damage_rounds + 1};
+  #if {$mytt_damage_rounds > 0} {
+    #math {mytt_damage_avg} {$mytt_damage_total / $mytt_damage_rounds};
+  };
+  #if {$mytt_damage_high == 0 || %4 > $mytt_damage_high} {
+    #var {mytt_damage_high} {%4};
+  };
+  #if {$mytt_damage_low == 0 || %4 < $mytt_damage_low} {
+    #var {mytt_damage_low} {%4};
+  };
+  #echo {DMG: <128>$mytt_damage_last<088> | AVG DMG: <132>$mytt_damage_avg<088> ($mytt_damage_rounds) | TOTAL DMG: <134>$mytt_damage_total<088> | HIGH: <121>$mytt_damage_high<088> | LOW: <124>$mytt_damage_low<088>};
+}
+#gag {You hit %* %d time%* for %d damage.}
+
+#alias {resetdmg} {
+  #var {mytt_damage_last} 0;
+  #var {mytt_damage_total} 0;
+  #var {mytt_damage_rounds} 0;
+  #var {mytt_damage_avg} 0;
+  #var {mytt_damage_high} 0;
+  #var {mytt_damage_low} 0;
+  #echo {Damage stats reset.};
+}
 
 #nop {De-Spam the guild}
 #gag {^High Guard %1 with %2 sword!}
@@ -54,12 +135,27 @@
         #var {my[effects][psummon][present]}{ON};
 }
 
+#act {%*High Guard%* is DEAD%*} {
+	#var {my[effects][psummon][present]}{OFF};
+	#var {my[effects][psummon][growth]}{OFF};
+}
+#act {%*High Guard%* disappears%*} {
+	#var {my[effects][psummon][present]}{OFF};
+	#var {my[effects][psummon][growth]}{OFF};
+}
+#act {%*High Guard%* leaves%*} {
+	#var {my[effects][psummon][present]}{OFF};
+	#var {my[effects][psummon][growth]}{OFF};
+}
+
 #act {Suddenly, High Guard grows to mammoth size!}{
         #var {my[effects][psummon][growth]}{ON};
 }
-#act {Animal Growth has already been cast on High Guard.}{
+#act {%*Growth has already been cast%*High Guard%*}{
         #var {my[effects][psummon][growth]}{ON};
 }
+
+#var {my[effects][psummon][growth_cooldown]} {0}
 
 
 #alias buyall {
@@ -83,19 +179,40 @@
 	#var {my[gp1][current]}	{%5};
 	#var {my[gp1][max]}	{%6};
 	#var {enemy[full]}	{%11};
+	#if {"$my[incombat]" == ""} { #var my[incombat] 0 };
+	#var {my[combat][was_incombat]} {$my[incombat]};
 	#regex {$enemy[full]}{%* : %d}{
-                #var enemy[name] &1;
-                #var enemy[health] &2;
-                #var my[incombat] 1;
-                #math {my[damagetracker][rounds]}{$my[damagetracker][rounds] + 1};
-        }{
-                #var enemy[name] None;
-                #var enemy[health] 0;
-                #var my[incombat] 0;
-        	#var {my[effects][psummon][present]}{OFF};
-        	#var {my[effects][psummon][growth]}{OFF};
-        };
+		#var enemy[name] &1;
+		#var enemy[health] &2;
+		#var my[incombat] 1;
+		#math {my[damagetracker][rounds]}{$my[damagetracker][rounds] + 1};
+	}{
+		#regex {$enemy[full]}{%*%d\%*}{
+			#var enemy[name] Unknown;
+			#var enemy[health] &1;
+			#var my[incombat] 1;
+			#math {my[damagetracker][rounds]}{$my[damagetracker][rounds] + 1};
+		}{
+			#var enemy[name] None;
+			#var enemy[health] 0;
+			#var my[incombat] 0;
+			#var {my[effects][psummon][present]}{OFF};
+			#var {my[effects][psummon][growth]}{OFF};
+		};
+	};
+
+	#if {$my[incombat] == 1}{
+		#if {$deadman_active == 0 && $my[combat][was_incombat] == 0 && $my[combat][start_cooldown] == 0} {
+			#var {my[combat][start_cooldown]} {1};
+			ensure_summons;
+			#delay {5} {#var {my[combat][start_cooldown]} {0}};
+		};
+
+		ensure_summons;
+	};
 }
+
+#act {%* rushes into combat%*} {ensure_summons};
 
 #gag {COFFIN: %3/%4 PTY: (%1\%) GXP%: [%2\%] MND: [%5/%6|%7]}
 #act {COFFIN: %3/%4 PTY: (%1\%) GXP%: [%2\%] MND: [%5/%6|%7]}{
@@ -106,6 +223,13 @@
 	#var {my[mend][current]}	{%5};
 	#var {my[mend][max]}		{%6};
 	#var {my[mend][reset]}		{%7};
+
+	#if {"$my[reverence][cooldown]" == ""} { #var {my[reverence][cooldown]} {0}; };
+	#if {$deadman_active == 0 && $my[reverence][cooldown] == 0 && %1 < 92} {
+		#var {my[reverence][cooldown]} {1};
+		reverence;
+		#delay {20} {#var {my[reverence][cooldown]} {0}};
+	};
 }
 
 #gag {CL: [%6\%] MED: %5 BARK: %1 VEST: %2 BLADE: %4 PROT: %3}
@@ -121,7 +245,11 @@
         #if {"$my[effects][blade]" != "ON"}{!blade};
         #if {"$my[effects][protection]" != "ON "}{!protection};
         #if {$my[incombat] == 1 && "$my[effects][psummon][present]" != "ON"}{!psummon};
-        #if {$my[incombat] == 1 && "$my[effects][psummon][growth]" != "ON"}{!growth guard};
+        #if {$my[incombat] == 1 && "$my[effects][psummon][growth]" != "ON" && $my[effects][psummon][growth_cooldown] == 0}{
+		#var {my[effects][psummon][growth_cooldown]} {1};
+		!growth guard;
+		#delay {30} {#var {my[effects][psummon][growth_cooldown]} {0}};
+	};
 	update_status;
 };
 
@@ -205,11 +333,11 @@
 		corpsetrig;
 	};
 }
-#act {Fluubit dealt the killing blow to}{
+#act {hayt dealt the killing blow to}{
 	log_damage_no_numbers %1;
 	#if {"$my[autocorpse][method]" != "off"}{
 		corpsetrig;
 	};
 }
 
-#class {fluubit} {close}
+#class {hayt} {close}

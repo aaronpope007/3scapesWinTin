@@ -7,8 +7,10 @@
 si;
 #var csea 1;
 #remember, go seacask goes to the cask... duh
+#killname human will set kills to human
+#clearkillname clears the kill name
 
-#alias longdelay {#delay {299} {#send {}};#delay {595} {#send {}};#delay {797} {#send {}};#delay {595} {#send {1055}};#delay {1354} {#send {}};#delay {1640} {#send {}};#delay {1931} {#send {}};#delay {2200} {#send {}};#delay {2469} {#send {}}};
+#alias longdelay {deadman_suspend_hour;#delay {299} {#send {}};#delay {595} {#send {}};#delay {797} {#send {}};#delay {595} {#send {1055}};#delay {1354} {#send {}};#delay {1640} {#send {}};#delay {1931} {#send {}};#delay {2200} {#send {}};#delay {2469} {#send {}}};
 
 #act {%*twirl%*around%*} {
 	#if {$twirl_sent == 1} {#return};
@@ -16,6 +18,23 @@ si;
 	#send {ee};
 	#delay {2} {#var twirl_sent 0};
 };
+
+#alias {ab} {activate blast};
+#alias {bar} {evoke barrier};
+#alias {cb} {evoke time stone};
+#alias {cs2} {pstats2};
+#alias {defense} {evoke elemental negation as};
+#alias {dmg} {evoke prismatic emission as};
+#alias {drain} {evoke energy drain};
+#alias {ee} {evoke equipollent};
+#alias {eval} {evoke evaluate at};
+#alias {gs} {escore};
+#alias {gs2} {escore2};
+#alias {gwho} {ewho};
+
+
+
+
 
 #act {%1 nudges you.} {
 	#if {$nudge_sent == 1} {#return};
@@ -29,7 +48,7 @@ si;
 		follow $person;
 		passist always $person;
 		salute $person;
-		#if {$my[equip] == "on"} n{
+		#if {$my[equip] == "on"} {
 			evoke equipollent as off;
 			#var my[equip] off;
 			say AOE IS TURNED OFF GOOD SIR!
@@ -68,12 +87,27 @@ si;
 #act {turn off equi} {evoke equipollent};
 #act {Hayt joins the party.} {partyrole wuss;passist always rictor;follow rictor};
 #act {You arrive at the Sea of Chaos.} {#delay {3600} {#bell;tell hayt -=> You can reset sea!}}
-#act {Digbicknick dealt the} {#delay {1} {ki}}
-#act {Digbicknick rushes into combat} {
+#act {Damage dealt the} {
+	#if {$deadman_active == 0} {#delay {1} {ki}}
+}
+#act {Damage rushes into combat} {
 	#if {$deadman_active == 1} {
 		#echo {<128>[DEADMAN] BLOCKED: merc hp - Idle exceeds 15 min limit<088>};
 	} {
-		merc hp;
+		#echo {<068>[Trigger] Sending: merc hp (Idle: $idle)<088>};
+		merc hp
+	}
+}
+
+#act {Support dealt the} {
+	#if {$deadman_active == 0} {#delay {1} {ki}}
+}
+#act {Support rushes into combat} {
+	#if {$deadman_active == 1} {
+		#echo {<128>[DEADMAN] BLOCKED: merc hp - Idle exceeds 15 min limit<088>};
+	} {
+		#echo {<068>[Trigger] Sending: merc hp (Idle: $idle)<088>};
+		merc hp
 	}
 }
 

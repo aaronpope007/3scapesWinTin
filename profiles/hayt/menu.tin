@@ -12,6 +12,11 @@
 #var {my[alts][2][guild]}{necromancer};
 #var {my[alts][2][subguild]}{reaper};
 
+#echo {3) Hayt(priest)};
+#var {my[alts][3][name]}{hayt3s};
+#var {my[alts][3][guild]}{priest};
+#var {my[alts][3][char_override]}{priest};
+
 
 #echo {};
 #echo {con <number>:};
@@ -19,6 +24,7 @@
 #line oneshot #alias {^%d$}{con %1};
 
 #line oneshot #alias {con}{
+	#var {char_override}{${my[alts][%1][char_override]}};
 	connect ${my[alts][%1][name]};
 	#unvar {my[alts]};
 	#unalias {con}

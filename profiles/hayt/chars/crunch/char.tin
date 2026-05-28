@@ -34,7 +34,7 @@ si;
 #alias {delay1} {kigxp;#delay {900} {kigxp;gs}}
 #alias {delay2} {kigxp;delay1;#delay {1800} {kigxp;gwho}}
 #alias {delay3} {kigxp;delay2;#delay {2700} {kigxp;gs2}}
-#alias {longdelay} {kigxp;delay3;#delay {3600} {kigxp;xp}}
+#alias {longdelay} {deadman_suspend_hour;kigxp;delay3;#delay {3600} {kigxp;xp}}
 #alias {tunderdark} {fantasy;pe;e;e;e;e;e;s;s;s;s;s;s;s;s;w;w;w;w;w;s;s;s;s;s;s;w;w;s}
 #alias {fdump} {u;w;w;sw;s;s;s;u;u;u;out;e;e;n;n;n;n;n;n;e;e;e;e;e;n;n;n;n;n;n;n;n;w;w;w;w;w;portal;home;leave;hc}
 
