@@ -53,11 +53,13 @@
 #ALIAS {safe_send} {
 	#if {$deadman_suspended == 1} {
 		#send {%0};
-	} #elseif {$deadman_active == 1} {
-		#echo {<128>[DEADMAN] BLOCKED: %0 - Idle exceeds 15 min limit<088>};
 	} {
-		#send {%0};
-	}
+		#if {$deadman_active == 1} {
+			#echo {<128>[DEADMAN] BLOCKED: %0 - Idle exceeds 15 min limit<088>};
+		} {
+			#send {%0};
+		};
+	};
 }
 
 #ALIAS {.testdeadman} {
@@ -169,19 +171,21 @@
 	};
 	#if {$deadman_suspended == 1} {
 		#format {idlewarning} {<068>[LONGDELAY: 1HR OPEN]<088>};
-	} #elseif {$idle > $IdleLimit} {
-		#if {$bot_was_active == 1} {
-			#format {idlewarning} {<128>[IDLED OUT]<088>};
-		} {
-			#format {idlewarning} {<128>[IDLE WARNING]<088>};
-		}
 	} {
-		#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
-			#math {seconds_left} {$IdleLimit - $idle};
-			#format {idlewarning} {<128>[WARNING: $seconds_left s LEFT]<088>};
+		#if {$idle > $IdleLimit} {
+			#if {$bot_was_active == 1} {
+				#format {idlewarning} {<128>[IDLED OUT]<088>};
+			} {
+				#format {idlewarning} {<128>[IDLE WARNING]<088>};
+			}
 		} {
-			#var idlewarning {};
-		}
+			#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
+				#math {seconds_left} {$IdleLimit - $idle};
+				#format {idlewarning} {<128>[WARNING: $seconds_left s LEFT]<088>};
+			} {
+				#var idlewarning {};
+			}
+		};
 	};
 	#if {"$bot_stop_reason" != ""} {
 		#format {stopreason} {<128>[$bot_stop_reason]<088>};
@@ -194,26 +198,28 @@
 			#SHOWME {<068>****************************************<088>} {20}
 			#SHOWME {<068>*  LONGDELAY: DEADMAN SUSPENDED 1 HOUR  *<088>} {21}
 			#SHOWME {<068>****************************************<088>} {22}
-		} #elseif {$idle > $IdleLimit} {
-			#if {$bot_was_active == 1} {
-				#SHOWME {<128>****************************************<088>} {20}
-				#SHOWME {<128>*  BOT DEACTIVATED DUE TO IDLE TIME  *<088>} {21}
-				#SHOWME {<128>*  Will auto-restart on next input  *<088>} {22}
-			} {
-				#SHOWME {<128>****************************************<088>} {20}
-				#SHOWME {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>} {21}
-				#SHOWME {<128>****************************************<088>} {22}
-			}
 		} {
-			#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
-				#math {seconds_left} {$IdleLimit - $idle};
-				#SHOWME {<128>****************************************<088>} {20}
-				#SHOWME {<128>*  WARNING: IDLE TIME APPROACHING 15 MIN  *<088>} {21}
-				#SHOWME {<128>*  $seconds_left seconds until bot stops!  *<088>} {22}
+			#if {$idle > $IdleLimit} {
+				#if {$bot_was_active == 1} {
+					#SHOWME {<128>****************************************<088>} {20}
+					#SHOWME {<128>*  BOT DEACTIVATED DUE TO IDLE TIME  *<088>} {21}
+					#SHOWME {<128>*  Will auto-restart on next input  *<088>} {22}
+				} {
+					#SHOWME {<128>****************************************<088>} {20}
+					#SHOWME {<128>*  WARNING: IDLE TIME EXCEEDED 15 MIN  *<088>} {21}
+					#SHOWME {<128>****************************************<088>} {22}
+				}
 			} {
-				#SHOWME {<088>} {20}
-				#SHOWME {<088>} {21}
-				#SHOWME {<088>} {22}
+				#if {$idle > $IdleWarningThreshold && $idle < $IdleLimit} {
+					#math {seconds_left} {$IdleLimit - $idle};
+					#SHOWME {<128>****************************************<088>} {20}
+					#SHOWME {<128>*  WARNING: IDLE TIME APPROACHING 15 MIN  *<088>} {21}
+					#SHOWME {<128>*  $seconds_left seconds until bot stops!  *<088>} {22}
+				} {
+					#SHOWME {<088>} {20}
+					#SHOWME {<088>} {21}
+					#SHOWME {<088>} {22}
+				}
 			}
 		}
 	};
@@ -258,16 +264,18 @@
 	};
 	#if {$deadman_suspended == 1} {
 		#var deadman_active 0;
-	} #elseif {$idle > $IdleLimit} {
-		#var deadman_active 1;
-		#NOP Force stop all keepalives when idle limit exceeded
-		#if {$keepalive_active == 1} {
-			#unticker party_keepalive;
-			#var keepalive_active 0;
-			#echo {<128>[Keepalive] FORCE STOPPED - Idle limit exceeded<088>};
-		};
 	} {
-		#var deadman_active 0;
+		#if {$idle > $IdleLimit} {
+			#var deadman_active 1;
+			#NOP Force stop all keepalives when idle limit exceeded
+			#if {$keepalive_active == 1} {
+				#unticker party_keepalive;
+				#var keepalive_active 0;
+				#echo {<128>[Keepalive] FORCE STOPPED - Idle limit exceeded<088>};
+			};
+		} {
+			#var deadman_active 0;
+		};
 	};
 	#if {$deadman_suspended == 0 && $bot == 1 && $idle > $IdleLimit && $idle_warned == 1} {
 		#math {ticks_since_input} {$tick_counter - $last_input_ticks};
@@ -305,45 +313,47 @@
 #TICKER {deadman_warning} {
 	#if {$deadman_suspended == 1} {
 		#var deadman_flash 0;
-	} #elseif {$idle > $IdleLimit && $idle_warned == 1} {
-		#if {$deadman_flash == 0} {
-			#var deadman_flash 1;
-			#if {$bot == 1} {
-				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-				#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-			} {
-				#if {$keepalive_active == 1} {
-					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
-					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
-					#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+	} {
+		#if {$idle > $IdleLimit && $idle_warned == 1} {
+			#if {$deadman_flash == 0} {
+				#var deadman_flash 1;
+				#if {$bot == 1} {
+					#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+					#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+					#echo {<fca><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
 				} {
-					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
-					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
-					#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+					#if {$keepalive_active == 1} {
+						#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+						#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+						#echo {<fca><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					} {
+						#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+						#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+						#echo {<fca><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+					}
+				}
+			} {
+				#var deadman_flash 0;
+				#if {$bot == 1} {
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+					#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
+				} {
+					#if {$keepalive_active == 1} {
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
+					} {
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+						#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
+					}
 				}
 			}
 		} {
 			#var deadman_flash 0;
-			#if {$bot == 1} {
-				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-				#echo {<fcb><fff>*** [DEADMAN WARNING] Bot active but idle for $idle seconds (15 min limit exceeded) - Bot will stop soon! ***<088>};
-			} {
-				#if {$keepalive_active == 1} {
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Keepalive active but idle for $idle seconds (15 min limit exceeded) ***<088>};
-				} {
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
-					#echo {<fcb><fff>*** [DEADMAN WARNING] Idle for $idle seconds (15 min limit exceeded) - No bot or keepalive active ***<088>};
-				}
-			}
-		}
-	} {
-		#var deadman_flash 0;
-	}
+		};
+	};
 } {2}
 
 #EVENT {RECEIVED INPUT} {
