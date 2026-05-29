@@ -2,6 +2,8 @@
 
 #var guild priest
 
+#alias longdelay {deadman_suspend_hour};
+
 #var {my[reverence][auto]} {0}
 #var {my[reverence][idle_max]} {60}
 #var {my[combat][start_cooldown]} {0}

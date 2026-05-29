@@ -21,22 +21,33 @@
 #NOP ***** Deadman Protection - Blocks all sends when idle > 15 min *****
 #var deadman_suspended 0
 #var deadman_suspend_secs 3600
+#var deadman_suspend_end_tick 0
 #var longdelay_cr_min 215
 #var longdelay_cr_max 299
 
 #NOP {Send CR during longdelay - varied delay between min and max seconds}
+#ALIAS {longdelay_clear} {
+	#undelay {longdelay_cr};
+	#undelay {longdelay_end};
+}
+
 #ALIAS {longdelay_cr_tick} {
 	#if {$deadman_suspended != 1} { #return };
 	#send {};
 	#math {longdelay_cr_span} {$longdelay_cr_max - $longdelay_cr_min + 1};
 	#math {longdelay_cr_secs} {1 d $longdelay_cr_span + $longdelay_cr_min - 1};
-	#delay {$longdelay_cr_secs} {longdelay_cr_tick};
+	#delay {longdelay_cr} {longdelay_cr_tick} {$longdelay_cr_secs};
 }
 
 #ALIAS {deadman_suspend_hour} {
+	#if {$deadman_suspended == 1} {
+		#echo {<068>[longdelay] Restarting - previous session cleared<088>};
+	};
+	longdelay_clear;
 	#var deadman_suspended 1;
 	#var deadman_active 0;
 	#var idle_warned 0;
+	#math {deadman_suspend_end_tick} {$tick_counter + $deadman_suspend_secs};
 	#echo {};
 	#echo {<068>****************************************<088>};
 	#echo {<068>*  DEADMAN SUSPENDED FOR 1 HOUR          *<088>};
@@ -46,12 +57,15 @@
 	#echo {<068>****************************************<088>};
 	#echo {};
 	longdelay_cr_tick;
-	#delay {$deadman_suspend_secs} {deadman_suspend_end};
+	#delay {longdelay_end} {deadman_suspend_end} {$deadman_suspend_secs};
 	update_caption;
 }
 
 #ALIAS {deadman_suspend_end} {
+	longdelay_clear;
 	#var deadman_suspended 0;
+	#var deadman_suspend_end_tick 0;
+	#bell;
 	#echo {};
 	#echo {<068>[DEADMAN] 1-hour suspension ended - 15 min idle limit active again<088>};
 	#echo {};
@@ -183,7 +197,17 @@
 		#format {botstatus} {<128>[BOT:OFF]<088>};
 	};
 	#if {$deadman_suspended == 1} {
-		#format {idlewarning} {<068>[LONGDELAY: 1HR OPEN]<088>};
+		#math {deadman_suspend_left} {$deadman_suspend_end_tick - $tick_counter};
+		#if {$deadman_suspend_left < 0} {
+			#var {deadman_suspend_left} {0};
+		};
+		#math {ld_hr} {$deadman_suspend_left / 3600};
+		#math {ld_min} {$deadman_suspend_left % 3600 / 60};
+		#math {ld_sec} {$deadman_suspend_left % 60};
+		#if {$ld_hr < 10} {#var ld_hr 0$ld_hr};
+		#if {$ld_min < 10} {#var ld_min 0$ld_min};
+		#if {$ld_sec < 10} {#var ld_sec 0$ld_sec};
+		#format {idlewarning} {<068>[LONGDELAY: <128>$ld_hr<068>:<128>$ld_min<068>:<128>$ld_sec<068> LEFT]<088>};
 	} {
 		#if {$idle > $IdleLimit} {
 			#if {$bot_was_active == 1} {
@@ -209,7 +233,7 @@
 		#SHOWME {<088> <128>$world_cap <068>Uptime: <168>$uptime_cap  <038>Reboot: <138>$reboot_cap  <fca>Lag: <fcb>$lag_cap  <228>Idle: $idle_cap<088>  $areacap<088> $stepper $mapstatus $botstatus $idlewarning $stopreason} {19}
 		#if {$deadman_suspended == 1} {
 			#SHOWME {<068>****************************************<088>} {20}
-			#SHOWME {<068>*  LONGDELAY: DEADMAN SUSPENDED 1 HOUR  *<088>} {21}
+			#SHOWME {<068>*  LONGDELAY: <128>$ld_hr<068>:<128>$ld_min<068>:<128>$ld_sec<068> REMAINING        *<088>} {21}
 			#SHOWME {<068>****************************************<088>} {22}
 		} {
 			#if {$idle > $IdleLimit} {
