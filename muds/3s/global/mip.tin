@@ -21,6 +21,17 @@
 #NOP ***** Deadman Protection - Blocks all sends when idle > 15 min *****
 #var deadman_suspended 0
 #var deadman_suspend_secs 3600
+#var longdelay_cr_min 215
+#var longdelay_cr_max 299
+
+#NOP Send CR during longdelay; random wait $longdelay_cr_min..$longdelay_cr_max seconds
+#ALIAS {longdelay_cr_tick} {
+	#if {$deadman_suspended != 1} { #return };
+	#send {};
+	#math {longdelay_cr_span} {$longdelay_cr_max - $longdelay_cr_min + 1};
+	#math {longdelay_cr_wait} {$longdelay_cr_min + 1d$longdelay_cr_span - 1};
+	#delay {$longdelay_cr_wait} {longdelay_cr_tick};
+}
 
 #ALIAS {deadman_suspend_hour} {
 	#var deadman_suspended 1;
@@ -31,8 +42,10 @@
 	#echo {<068>*  DEADMAN SUSPENDED FOR 1 HOUR          *<088>};
 	#echo {<068>*  Commands allowed despite idle time   *<088>};
 	#echo {<068>*  (longdelay / scheduled activity)     *<088>};
+	#echo {<068>*  CR keepalive: random $longdelay_cr_min-$longdelay_cr_max sec *<088>};
 	#echo {<068>****************************************<088>};
 	#echo {};
+	longdelay_cr_tick;
 	#delay {$deadman_suspend_secs} {deadman_suspend_end};
 	update_caption;
 }
