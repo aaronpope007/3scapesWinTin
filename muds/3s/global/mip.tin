@@ -24,13 +24,13 @@
 #var longdelay_cr_min 215
 #var longdelay_cr_max 299
 
-#NOP Send CR during longdelay; wait $longdelay_cr_min..$longdelay_cr_max sec (1 d span)
+#NOP {Send CR during longdelay - varied delay between min and max seconds}
 #ALIAS {longdelay_cr_tick} {
 	#if {$deadman_suspended != 1} { #return };
 	#send {};
 	#math {longdelay_cr_span} {$longdelay_cr_max - $longdelay_cr_min + 1};
-	#math {longdelay_cr_wait} {1 d $longdelay_cr_span + $longdelay_cr_min - 1};
-	#delay {$longdelay_cr_wait} {longdelay_cr_tick};
+	#math {longdelay_cr_secs} {1 d $longdelay_cr_span + $longdelay_cr_min - 1};
+	#delay {$longdelay_cr_secs} {longdelay_cr_tick};
 }
 
 #ALIAS {deadman_suspend_hour} {
